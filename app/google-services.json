@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "749841247816",
+    "firebase_url": "https://shaped-glazing-266021.firebaseio.com",
+    "project_id": "shaped-glazing-266021",
+    "storage_bucket": "shaped-glazing-266021.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:749841247816:android:9e3e2c4bdc95fa3206f27d",
+        "android_client_info": {
+          "package_name": "com.yue.mymovie"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "749841247816-3a0u1dgpurvb8qkf5g05qdam3j0ke6ds.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeT2u1fskLvn7wVpmJd8ok7F5XzBngS88"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "749841247816-3a0u1dgpurvb8qkf5g05qdam3j0ke6ds.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

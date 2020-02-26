@@ -1,0 +1,21 @@
+<resources>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="app_name">Film Finder</string>
+    <string name="share_link">Share The Link</string>
+    <string name="copy_the_link">Copy The Link</string>
+    <!-- add bottom bar string -->
+    <string name="find">Find</string>
+    <string name="save">Save</string>
+    <string name="map">Map</string>
+    <string name="profile">Profile</string>
+    <string name="api_version">v200</string>
+    <string name="language">en-US</string>
+    <string name="img_front_path">https://image.tmdb.org/t/p/w600_and_h900_bestv2/</string>
+    <string name="youtube_front_path">https://www.youtube.com/embed/</string>
+    <string name="no_name_user">values/strings.xml:16</string>
+    <string name="page">15</string>
+    <string name="add_contacts">Add contacts</string>
+    <string name="cancle">Cancle</string>
+    <string name="confirm">Confirm</string>
+</resources>

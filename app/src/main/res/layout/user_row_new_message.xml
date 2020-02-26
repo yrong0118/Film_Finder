@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/username_textview_new_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="16dp"
+        android:text="Username"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/imageview_new_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageview_new_message"
+        app:layout_constraintTop_toTopOf="@+id/imageview_new_message" />
+
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/imageview_new_message"
+        app:layout_constraintTop_toTopOf="@id/imageview_new_message"
+        app:layout_constraintBottom_toBottomOf="@id/imageview_new_message"
+        android:layout_marginLeft="@dimen/eight_dp"
+        android:layout_marginRight="@dimen/eight_dp"
+        android:id="@+id/ic_radio_button_choose_contacts_new_Message"
+        app:srcCompat="@drawable/ic_radio_button_unchecked"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imageview_new_message"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:civ_border_width="2dp"
+        app:layout_constraintStart_toEndOf="@id/ic_radio_button_choose_contacts_new_Message"
+        app:layout_constraintTop_toTopOf="parent"
+        app:civ_border_color="@color/light_gray"
+        app:srcCompat="@android:drawable/btn_dialog" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/two_dp"
+        android:layout_marginRight="@dimen/two_dp"
+        android:background="@color/light_gray"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/username_textview_new_message"
+        app:layout_constraintTop_toBottomOf="@id/imageview_new_message" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
