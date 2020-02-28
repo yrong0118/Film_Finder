@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.yue.mymovie.Chat.ChatActivity
 import com.yue.mymovie.LoginOrRegister.LoginOrRegisterActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListen
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.container,movieListFragment)
-//                        .addToBackStack(movieListFragment.toString())
+                        .addToBackStack(movieListFragment.toString())
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit()
                 }
@@ -51,9 +52,14 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListen
                     supportFragmentManager
                         .beginTransaction()
                         .replace(R.id.container,savedMoveFragment)
-//                        .addToBackStack(savedInstanceState.toString())
+                        .addToBackStack(savedInstanceState.toString())
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                         .commit()
+                }
+                R.id.action_chat_vote ->{
+                    val intent = Intent(this, ChatActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    startActivity(intent)
                 }
 
             }

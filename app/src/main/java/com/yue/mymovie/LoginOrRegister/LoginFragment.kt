@@ -86,57 +86,15 @@ class LoginFragment : Fragment() {
         email.addTextChangedListener(textWatcher!!)
         passWord.addTextChangedListener(textWatcher!!)
 
+        progressBar.visibility = View.INVISIBLE
+
         firebaseAuth = FirebaseAuth.getInstance()
 
         submitBtn.setOnClickListener {
             //            sleep(1000)
-//            firebaseAnalytics.logEvent("login_clicked", null)
-            Log.d(TAG, "Email is: " + email.text.toString())
-            Log.d(TAG, "Password is: " + password_edittext_login.text.toString())
-            progressBar.visibility = View.VISIBLE
-            val inputtedUsername: String = email_edittext_login.text.toString().trim()
-            val inputtedPassword: String = passWord.text.toString()
 
-            val intent = Intent(this.activity, MainActivity::class.java)
-            startActivity(intent)
+            performLogin(preferences)
 
-            firebaseAuth
-                .signInWithEmailAndPassword(inputtedUsername, inputtedPassword)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        val currentUser: FirebaseUser? = firebaseAuth.currentUser
-                        val currUserEmail = currentUser?.email
-                        Toast.makeText(this.activity, "Logged in as: $currUserEmail", Toast.LENGTH_SHORT).show()
-
-                        // Save the inputted username to file
-                        preferences
-                            .edit()
-                            .putString("SAVED_USERNAME", email.text.toString().trim())
-                            .apply()
-                        preferences
-                            .edit()
-                            .putString("SAVED_PASSWORD", passWord.text.toString())
-                            .apply()
-
-                        val intent = Intent(this.activity, MainActivity::class.java)
-                        startActivity(intent)
-
-                    } else {
-                        val exception = task.exception
-
-                        // Example of logging some extra metadata (the error reason) with our analytic
-                        val reason =
-                            if (exception is FirebaseAuthInvalidCredentialsException) "invalid_credentials" else "connection_failure"
-                        val bundle = Bundle()
-                        bundle.putString("error_type", reason)
-
-                        Toast.makeText(this.activity, "Login failed: $exception", Toast.LENGTH_SHORT)
-                            .show()
-
-                        progressBar.visibility = View.INVISIBLE
-
-                    }
-                }
         }
         goToRegister.setOnClickListener {
             Log.d("Register Fragment", "Go to Register Fragment")
@@ -144,6 +102,54 @@ class LoginFragment : Fragment() {
 
         }
         return view
+    }
+
+    private fun performLogin(preferences: SharedPreferences) {
+        // firebaseAnalytics.logEvent("login_clicked", null)
+        Log.d(TAG, "Email is: " + email.text.toString())
+        Log.d(TAG, "Password is: " + password_edittext_login.text.toString())
+        progressBar.visibility = View.VISIBLE
+
+        val inputtedUsername: String = email_edittext_login.text.toString().trim()
+        val inputtedPassword: String = passWord.text.toString()
+
+        firebaseAuth
+            .signInWithEmailAndPassword(inputtedUsername, inputtedPassword)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val currentUser: FirebaseUser? = firebaseAuth.currentUser
+                    val currUserEmail = currentUser?.email
+                    Toast.makeText(this.activity, "Logged in as: $currUserEmail", Toast.LENGTH_SHORT).show()
+
+                    // Save the inputted username to file
+                    preferences
+                        .edit()
+                        .putString("SAVED_USERNAME", email.text.toString().trim())
+                        .apply()
+                    preferences
+                        .edit()
+                        .putString("SAVED_PASSWORD", passWord.text.toString())
+                        .apply()
+
+                    val intent = Intent(this.activity, MainActivity::class.java)
+                    startActivity(intent)
+
+                } else {
+                    val exception = task.exception
+
+                    // Example of logging some extra metadata (the error reason) with our analytic
+                    val reason =
+                        if (exception is FirebaseAuthInvalidCredentialsException) "invalid_credentials" else "connection_failure"
+                    val bundle = Bundle()
+                    bundle.putString("error_type", reason)
+
+                    Toast.makeText(this.activity, "Login failed: $exception", Toast.LENGTH_SHORT)
+                        .show()
+
+                    progressBar.visibility = View.INVISIBLE
+
+                }
+            }
     }
 
     private var textWatcher: TextWatcher? = object :TextWatcher{

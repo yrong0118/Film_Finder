@@ -1,13 +1,14 @@
 package com.yue.mymovie.Chat
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
+import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.Movie
 import com.yue.mymovie.R
 
-class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener {
-//
+class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,NewMessageFragment.ConfirmToChatLognListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +24,16 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener {
             .beginTransaction()
             .replace(R.id.chat_container,newMessageFragment)
             .addToBackStack(newMessageFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun confirmToChatLogListener(list:ArrayList<User>) {
+        var chatLogFragment = ChatLogFragment.newInstance(list)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,chatLogFragment)
+            .addToBackStack(chatLogFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }

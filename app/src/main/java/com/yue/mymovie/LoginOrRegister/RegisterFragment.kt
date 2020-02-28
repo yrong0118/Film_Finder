@@ -69,6 +69,7 @@ class RegisterFragment : Fragment() {
         hasAcound = view.findViewById(R.id.already_have_account_text_view)
         registerBtn = view.findViewById(R.id.register_button_register)
         selectedPhotoBtn = view.findViewById(R.id.selectphoto_button_register)
+
         registerBtn.setOnClickListener {
 
             performRegister()

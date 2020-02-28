@@ -56,7 +56,7 @@
         android:layout_marginRight="@dimen/two_dp"
         android:background="@color/light_gray"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/username_textview_new_message"
+        app:layout_constraintStart_toStartOf="@id/username_textview_new_message"
         app:layout_constraintTop_toBottomOf="@id/imageview_new_message" />
 
 

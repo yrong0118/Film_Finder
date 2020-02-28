@@ -19,6 +19,11 @@ import com.yue.mymovie.MainActivity
 
 import com.yue.mymovie.R
 import android.view.LayoutInflater
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.yue.mymovie.LoginOrRegister.User
 
 
 /**
@@ -36,6 +41,7 @@ class ChatListFragment : Fragment() {
 
     companion object {
 
+        var currentUser: User? = null
         val TAG = "ChatList Frafment"
         fun newInstance(): ChatListFragment {
             var args = Bundle()
@@ -53,15 +59,29 @@ class ChatListFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_chat_list, container, false)
 
-//        verifyUserIsLoggedIn()
+        fetchCurrentUser()
+        verifyUserIsLoggedIn()
 
         addCircle = view.findViewById(R.id.ic_add_circle_chat)
 
-//        addCircle.setOnClickListener{
-//            mCallback.addGroupChat()
-//        }
         addCircle.setOnClickListener(View.OnClickListener { v -> showMenu(v) })
         return view
+    }
+
+    private fun fetchCurrentUser() {
+        val uid = FirebaseAuth.getInstance().uid
+        val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+
+            override fun onDataChange(p0: DataSnapshot) {
+                currentUser = p0.getValue(User::class.java)
+                Log.d("LatestMessages", "Current user ${currentUser?.profileImageUrl}")
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        })
     }
 
 

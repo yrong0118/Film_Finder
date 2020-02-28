@@ -161,11 +161,13 @@ class MovieDetailsFragment : Fragment() {
         Picasso
             .get()
             .load(filmImg)
+            .placeholder(R.drawable.no_images_available)
             .into(movieBGImg)
 
         Picasso
             .get()
             .load(filmImg)
+            .placeholder(R.drawable.no_images_available)
             .into(movieImg)
 
         movieRating.setText(rating)

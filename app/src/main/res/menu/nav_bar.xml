@@ -6,6 +6,9 @@
     <item android:id="@+id/action_save"
         android:title="@string/save"
         android:icon="@drawable/ic_save_24dp" />
+    <item android:id="@+id/action_chat_vote"
+        android:title="@string/chat"
+        android:icon="@drawable/ic_chat_vote" />
     <item android:id="@+id/action_map"
         android:title="@string/map"
         android:icon="@drawable/ic_map_24dp" />

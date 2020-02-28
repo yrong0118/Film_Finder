@@ -19,12 +19,13 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>
+
     <TextView
         android:id="@+id/ic_cancle_chat_list"
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_marginLeft="@dimen/eight_dp"
-        android:background="@color/light_blue"
+        android:background="@drawable/button_clickable"
         android:gravity="center"
         android:text="@string/cancle"
         android:textSize="14sp"
@@ -40,9 +41,9 @@
         android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_marginRight="@dimen/eight_dp"
-        android:background="@color/light_blue"
+        android:background="@drawable/button_unclickable"
         android:gravity="center"
-        android:text="@string/cancle"
+        android:text="@string/confirm"
         android:textSize="14sp"
         android:textColor="@color/white"
         android:padding="@dimen/two_dp"

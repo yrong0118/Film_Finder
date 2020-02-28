@@ -8,6 +8,7 @@
     <string name="find">Find</string>
     <string name="save">Save</string>
     <string name="map">Map</string>
+    <string name="chat">Chat</string>
     <string name="profile">Profile</string>
     <string name="api_version">v200</string>
     <string name="language">en-US</string>
