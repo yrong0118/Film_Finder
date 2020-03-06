@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+<!--    https://www.youtube.com/watch?v=FZfjWXYm80k-->
+
+
+    <EditText
+        android:id="@+id/end_date_btn_creat_vote"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/rounded_edittext_register_login"
+        android:hint="@string/choose_date"
+        android:paddingLeft="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/search_movie_name"
+        app:layout_constraintEnd_toStartOf="@+id/add_vote_cancel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/add_vote_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/ten_dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_cancle_window" />
+
+
+    <com.miguelcatalan.materialsearchview.MaterialSearchView
+        android:id="@+id/search_movie_name"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        app:searchBackIcon="@drawable/ic_arrow"
+        app:searchCloseIcon="@drawable/ic_close"
+        android:textColorHint="@color/gray"
+        android:textColor="@color/dark_gray"
+        app:searchBackground="@drawable/rounded_edittext_register_login"
+        android:hint="@string/search_movie_name"
+        android:paddingLeft="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/end_date_btn_creat_vote"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/end_date_btn_creat_vote"/>
+
+
+    <ListView
+        android:id="@+id/recyclerView_movie_result_matches"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="@id/search_movie_name"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@id/search_movie_name"
+        app:layout_constraintTop_toBottomOf="@+id/search_movie_name"
+        app:layout_constraintVertical_bias="1.0"
+        android:divider="@color/light_gray"
+        android:dividerHeight="1dp"
+        />
+
+
+    <Button
+        android:id="@+id/button"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="Button"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_movie_list_selected"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_movie_name"
+        app:layout_constraintVertical_bias="1.0" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="app_name">Film Finder</string>
+    <string name="film_chat">Film Chat</string>
     <string name="share_link">Share The Link</string>
     <string name="copy_the_link">Copy The Link</string>
     <!-- add bottom bar string -->
@@ -19,4 +20,6 @@
     <string name="add_contacts">Add contacts</string>
     <string name="cancle">Cancle</string>
     <string name="confirm">Confirm</string>
+    <string name="search_movie_name">Search Movie Name You Want to Vote</string>
+    <string name="choose_date">Choose the End Date of the Vote</string>
 </resources>

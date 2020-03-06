@@ -19,11 +19,14 @@ import com.yue.mymovie.MainActivity
 
 import com.yue.mymovie.R
 import android.view.LayoutInflater
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.*
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.GroupieViewHolder
+import com.yue.mymovie.Chat.ChatModel.ListLatestMessage
 import com.yue.mymovie.LoginOrRegister.User
+import com.yue.mymovie.Util
+import com.yue.mymovie.Util.Companion.fetchCurrentUser2
 
 
 /**
@@ -40,8 +43,9 @@ class ChatListFragment : Fragment() {
 
 
     companion object {
-
-        var currentUser: User? = null
+        lateinit var recyclerview_latest_messages : RecyclerView
+//        var currentUser: User? = null
+        var currentUserUid :String?=""
         val TAG = "ChatList Frafment"
         fun newInstance(): ChatListFragment {
             var args = Bundle()
@@ -49,7 +53,7 @@ class ChatListFragment : Fragment() {
             fragment.setArguments(args)
             return fragment
         }
-
+        var adapter = GroupAdapter<GroupieViewHolder>()
     }
 
     override fun onCreateView(
@@ -58,31 +62,59 @@ class ChatListFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_chat_list, container, false)
+        recyclerview_latest_messages = view.findViewById(R.id.recyclerview_latest_messages)
+        currentUserUid =Util.getCurrentUserUid()
+        recyclerview_latest_messages.adapter = adapter
 
-        fetchCurrentUser()
+        adapter.clear()
+
+//        currentUser = fetchCurrentUser()
         verifyUserIsLoggedIn()
 
-        addCircle = view.findViewById(R.id.ic_add_circle_chat)
+        fetchCurrentUser2 { currentUser ->
 
-        addCircle.setOnClickListener(View.OnClickListener { v -> showMenu(v) })
+            listenForLatestMessages()
+            addCircle = view.findViewById(R.id.ic_add_circle_chat)
+            addCircle.setOnClickListener(View.OnClickListener { v -> showMenu(v) })
+
+        }
+
+
         return view
+
     }
 
-    private fun fetchCurrentUser() {
-        val uid = FirebaseAuth.getInstance().uid
-        val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-        ref.addListenerForSingleValueEvent(object: ValueEventListener {
+    private fun listenForLatestMessages() {
+        val ref = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/$currentUserUid")
+        ref.addChildEventListener(object: ChildEventListener {
+            override fun onChildAdded(p0: DataSnapshot, p1: String?) {
+                val listLateMessage = p0.getValue(ListLatestMessage::class.java) ?: return
+                adapter.add(LastMessageItem(listLateMessage.text,listLateMessage.username,listLateMessage.imageUri,listLateMessage.timestamp,listLateMessage.readOrNot))
+                adapter.notifyDataSetChanged()
 
-            override fun onDataChange(p0: DataSnapshot) {
-                currentUser = p0.getValue(User::class.java)
-                Log.d("LatestMessages", "Current user ${currentUser?.profileImageUrl}")
+
             }
 
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+                val listLateMessage = p0.getValue(ListLatestMessage::class.java) ?: return
+                adapter.add(LastMessageItem(listLateMessage.text,listLateMessage.username,listLateMessage.imageUri,listLateMessage.timestamp,listLateMessage.readOrNot))
+                adapter.notifyDataSetChanged()
+//                recyclerview_latest_messages.adapter = adapter
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+
+            }
+            override fun onChildRemoved(p0: DataSnapshot) {
+
+            }
             override fun onCancelled(p0: DatabaseError) {
 
             }
         })
     }
+
+
 
 
     @SuppressLint("RestrictedApi")
@@ -117,8 +149,8 @@ class ChatListFragment : Fragment() {
     }
 
     private fun verifyUserIsLoggedIn() {
-        val uid = FirebaseAuth.getInstance().uid
-        if (uid == null) {
+//        val uid = FirebaseAuth.getInstance().uid
+        if (currentUserUid == null) {
             val intent = Intent(this.activity, LoginOrRegisterActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK.or(Intent.FLAG_ACTIVITY_NEW_TASK)
             startActivity(intent)

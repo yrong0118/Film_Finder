@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,18 +16,19 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import com.yue.mymovie.Chat.ChatModel.*
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.R
+import com.yue.mymovie.Util
+import com.yue.mymovie.Util.Companion.getLogChatHead
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.user_row_new_message.view.*
+import java.util.concurrent.CountDownLatch
 
 
 /**
@@ -43,11 +45,10 @@ class NewMessageFragment : Fragment() {
 
     interface ConfirmToChatLognListener {
 
-        fun confirmToChatLogListener(list:ArrayList<User>)
+        fun confirmToChatLogListener(list:ArrayList<User>,groupId : String)
     }
 
     companion object {
-
         val TAG = "NewMessage Frafment"
         fun newInstance(): NewMessageFragment {
             var args = Bundle()
@@ -55,6 +56,8 @@ class NewMessageFragment : Fragment() {
             fragment.setArguments(args)
             return fragment
         }
+
+        var currentUserUid = Util.getCurrentUserUid()
     }
 
     override fun onCreateView(
@@ -72,29 +75,162 @@ class NewMessageFragment : Fragment() {
 
         var adapter=  GroupAdapter<GroupieViewHolder>()
 //        adapter.add(UserItem())
-//        adapter.add(UserItem())
-//        adapter.add(UserItem())
-//        adapter.add(UserItem())
-        var res :ArrayList<ChooseUse> = arrayListOf()
-        var selctectedContact :ArrayList<User> = arrayListOf()
 
-        fetchUsers(adapter,inflater,container!!,res,selctectedContact)
+        var res :ArrayList<ChooseUse> = arrayListOf()
+
+        var selectectedContact :ArrayList<User> = arrayListOf()
+
+        fetchUsers(adapter,inflater,container!!,res,selectectedContact)
 
         recyclerview_newmessage.setLayoutManager(manager);
 
         recyclerview_newmessage.adapter = adapter
 
+
         confirmBtn.setOnClickListener {
-            mCallback.confirmToChatLogListener(selctectedContact)
+            var groupOrSingleId : String ?= ""
+            if(selectectedContact.size > 1){
+                var groupId = createGroupData(selectectedContact)
+                groupOrSingleId = groupId
+
+            } else {
+                groupOrSingleId = CheckSingleData(selectectedContact.get(0).uid)
+            }
+
+            mCallback.confirmToChatLogListener(selectectedContact,groupOrSingleId!!)
+
         }
         return view
     }
 
+    private fun CheckSingleData(toUserId : String):String{
+
+        val twoPersonChatId = getTwoPersonChatId(currentUserUid, toUserId)
+
+
+        createSingleData(twoPersonChatId,toUserId, currentUserUid)
+
+        return twoPersonChatId
+
+        val chatIdRef = FirebaseDatabase.getInstance().getReference("${Util.LISTS}/${currentUserUid}")
+        var isHas = false
+
+        chatIdRef.orderByChild("groupOrTwoPersonChatId").equalTo(twoPersonChatId).addChildEventListener(object:
+            ChildEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+
+                val latestMessage = dataSnapshot.getValue(ListLatestMessage::class.java)
+                println(dataSnapshot.getKey() + " was " + latestMessage!!.groupOrTwoPersonChatId + " has create the single chat.")
+                isHas = true
+                return
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+
+            }
+
+        })
+
+        if(!isHas){
+            createSingleData(twoPersonChatId,toUserId, currentUserUid)
+        }
+
+        return twoPersonChatId
+
+    }
+
+    private fun createSingleData(twoPersonChatId : String,toUserId: String,froUserId: String){
+        val reference = FirebaseDatabase.getInstance().getReference("/${Util.TWOPERSONCHATS}/$twoPersonChatId")
+        var memberList = arrayListOf<String>()
+        memberList.add(toUserId)
+        memberList.add(froUserId)
+
+        val twoPersonChat = TwoPersonChat(twoPersonChatId,memberList)
+        reference.setValue(twoPersonChat)
+            .addOnSuccessListener {
+                Log.d(TAG, "Saved the twoPersonChat: ${reference.key}")
+            }
+
+        val referenceCreater = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUserUid}/${twoPersonChatId}")
+        Util.fetchUser(toUserId){toUser ->
+            val listLatestMessage = ListLatestMessage(twoPersonChatId, toUser.username,
+                toUser.profileImageUrl,"",true,System.currentTimeMillis() / 1000)
+            referenceCreater.setValue(listLatestMessage)
+                .addOnSuccessListener {
+                    Log.d(TAG, "Saved the group on the creater list,twoPersonChatId: ${twoPersonChatId}")
+                }
+        }
+
+    }
+
+    private fun getTwoPersonChatId(currentUser: String, toUserId: String): String {
+        val curArray = currentUser.toCharArray()
+        val toUserArray = toUserId.toCharArray()
+        if (curArray.size < toUserArray.size){
+            return "$currentUser$toUserId"
+        } else if (curArray.size > toUserArray.size){
+            return "$toUserId$currentUser"
+        }else {
+            var index = 0
+            curArray.forEach {
+                if (it < toUserArray[index]){
+                    return "$currentUser$toUserId"
+                } else if(it > toUserArray[index]) {
+                    return "$toUserId$currentUser"
+                }
+                index++
+
+
+            }
+        }
+        return ""
+    }
+
+    private fun createGroupData(selctectedContact:ArrayList<User>): String{
+        val reference = FirebaseDatabase.getInstance().getReference("/${Util.GROUPCHATS}").push()
+        val groups = GroupsChat(reference.key!!,currentUserUid, getGroupMember(selctectedContact))
+        reference.setValue(groups)
+            .addOnSuccessListener {
+                Log.d(TAG, "Saved the Group: ${reference.key}")
+            }
+        val referenceCreater = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUserUid}/${reference.key!!}")
+
+        val listLatestMessage = ListLatestMessage(reference.key!!,getLogChatHead(selctectedContact),"","",true,System.currentTimeMillis() / 1000)
+
+        referenceCreater.setValue(listLatestMessage)
+            .addOnSuccessListener {
+                Log.d(TAG, "Saved the group on the creater list: ${referenceCreater.key}")
+            }
+        return reference.key!!
+    }
+
+    private fun getGroupMember(selectectedContact: ArrayList<User>): ArrayList<String> {
+        var  iterator = selectectedContact.iterator()
+        val result : ArrayList<String> = arrayListOf()
+        iterator.forEach{
+            result.add(it.uid)
+        }
+        return result;
+    }
+
+
     private fun fetchusersAdapter(adapter: GroupAdapter<GroupieViewHolder>,inflater: LayoutInflater,container: ViewGroup?,res:ArrayList<ChooseUse>,selectectedContact:ArrayList<User>) {
          res.forEach{
-             Log.d("NewMessage", it.toString())
+             Log.d("NewMessage", "each user name: " + it.username)
              if (container!= null){
-                 adapter.add(UserItem(it,inflater,container!!))
+                 adapter.add(UserItem(it))
              }
          }
 
@@ -102,7 +238,7 @@ class NewMessageFragment : Fragment() {
 
             var userItem = item as UserItem
             Log.d(TAG,"choose contacts:${userItem.user.selected}")
-            val view = inflater.inflate(com.yue.mymovie.R.layout.user_row_new_message, container, false)
+            val view = inflater.inflate(R.layout.user_row_new_message, container, false)
             selectedBtn = view.findViewById(R.id.ic_radio_button_choose_contacts_new_Message)
 
             var  iterator = selectectedContact.iterator()
@@ -144,14 +280,14 @@ class NewMessageFragment : Fragment() {
 
     private fun fetchUsers(adapter: GroupAdapter<GroupieViewHolder>, inflater: LayoutInflater, container: ViewGroup,res : ArrayList<ChooseUse>,selectectedContact:ArrayList<User>) {
         val ref = FirebaseDatabase.getInstance().getReference("/users")
-        val toId = FirebaseAuth.getInstance().uid
+
         ref.addListenerForSingleValueEvent(object: ValueEventListener {
 
             override fun onDataChange(p0: DataSnapshot) {
                 p0.children.forEach {
                     Log.d(TAG, it.toString())
                     val user = it.getValue(User::class.java)
-                    if (user != null && user.uid != toId) {
+                    if (user != null && user.uid != currentUserUid) {
                            res.add(ChooseUse(user.uid,user.username,user.email, user.profileImageUrl,false))
                     }
                 }
@@ -177,7 +313,7 @@ class NewMessageFragment : Fragment() {
     }
 }
 
-class UserItem(val user: ChooseUse, val inflater: LayoutInflater, val container: ViewGroup): Item<GroupieViewHolder>() {
+class UserItem(val user: ChooseUse): Item<GroupieViewHolder>() {
 //    lateinit var selectedButton:ImageView
     override fun getLayout(): Int {
         return R.layout.user_row_new_message

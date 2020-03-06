@@ -28,8 +28,8 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
             .commit()
     }
 
-    override fun confirmToChatLogListener(list:ArrayList<User>) {
-        var chatLogFragment = ChatLogFragment.newInstance(list)
+    override fun confirmToChatLogListener(list:ArrayList<User>,groupId:String) {
+        var chatLogFragment = ChatLogFragment.newInstance(list,groupId)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,chatLogFragment)
@@ -37,4 +37,6 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
+
+
 }

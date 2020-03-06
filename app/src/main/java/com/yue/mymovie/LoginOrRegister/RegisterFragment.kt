@@ -23,6 +23,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.yue.mymovie.MainActivity
 
 import com.yue.mymovie.R
+import com.yue.mymovie.Util
 import kotlinx.android.synthetic.main.fragment_register.*
 import java.util.*
 
@@ -175,7 +176,7 @@ class RegisterFragment : Fragment() {
 
         val uid = FirebaseAuth.getInstance().uid ?: ""
 
-        val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+        val ref = FirebaseDatabase.getInstance().getReference("/${Util.USERS}/$uid")
 
         val user = User(uid, username_edittext_register.text.toString(), emailEt.text.toString(),profileImageUrl)
 

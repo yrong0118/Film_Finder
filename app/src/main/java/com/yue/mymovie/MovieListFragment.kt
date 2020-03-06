@@ -57,7 +57,7 @@ class MovieListFragment : Fragment() {
         val n = getString(R.string.page)
 
         mry = view.findViewById(R.id.recycleview_movie)
-        mry.layoutManager= GridLayoutManager(this.context,3)
+        mry.layoutManager = GridLayoutManager(this.context,3)
 
         doAsync{
             try{
