@@ -105,27 +105,36 @@ class Util {
             })
         }
 
-        fun getLogChatHead(selectedList: ArrayList<User>):String{
+
+        fun getLogChatHead(selectedList: ArrayList<User>, currentUserName: String):String{
+            if (selectedList.size == 1) {
+                return selectedList.get(0).username
+            }
+
             var res = ""
             var count  = 0
             selectedList.forEach{
-                if (count != selectedList.size - 1){
-                    res += it.username + ", "
-//                Log.d(TAG,it.username)
-
-                } else {
-                    res += it.username
-                }
+                res += it.username + ", "
                 count ++
             }
+            res += currentUserName
             Log.d(ChatLogFragment.TAG,res)
             return res
 
         }
 
+
+
     }
 
 
+    class ChatLog (
+        var chatLogId : String,
+        var chatLogHeader :String
+
+    ){
+        constructor():this("", "")
+    }
 
 
 }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageview_new_vote"
+        android:layout_width="40dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="@id/delimiter_new_vote"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/no_images_available" />
+
+    <TextView
+        android:id="@+id/movie_name_textview_new_vote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:text="Username"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageview_new_vote"
+        app:layout_constraintStart_toEndOf="@+id/imageview_new_vote"
+        app:layout_constraintTop_toTopOf="@id/imageview_new_vote"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:maxWidth="150dp"/>
+
+
+
+    <View
+        android:id="@+id/delimiter_new_vote"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="@dimen/four_dp"
+        android:layout_marginRight="@dimen/four_dp"
+        android:layout_marginTop="@dimen/eight_dp"
+        android:background="@color/light_gray"
+        app:layout_constraintTop_toBottomOf="@id/imageview_new_vote" />
+
+
+    <ImageView
+        android:id="@+id/ic_radio_button_choose_movie_new_vote"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageview_new_vote"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imageview_new_vote"
+        android:layout_marginLeft="@dimen/eight_dp"
+        android:layout_marginRight="@dimen/eight_dp"
+        app:srcCompat="@drawable/ic_radio_button_unchecked"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

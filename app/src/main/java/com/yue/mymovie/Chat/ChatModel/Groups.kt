@@ -1,5 +1,7 @@
 package com.yue.mymovie.Chat.ChatModel
 
+import com.yue.mymovie.LoginOrRegister.User
+import com.yue.mymovie.Util
 import java.sql.Timestamp
 
 class GroupsChat (
@@ -36,12 +38,12 @@ class ChatTtpe (
 }
 
 class ListLatestMessage(
-    val groupOrTwoPersonChatId: String,
-    val username : String,
+    val chatLog : Util.ChatLog,
+    val selectedUserList: ArrayList<User>,
     val imageUri : String,
     val text: String,
     val readOrNot:Boolean,
     val timestamp: Long
 ){
-    constructor():this("","","","",true,-1)
+    constructor():this( Util.ChatLog(), arrayListOf<User>(),"","",true,-1)
 }

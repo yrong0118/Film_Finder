@@ -82,3 +82,97 @@ fun fetchCurrentUser():User{
     return Util.currentUser!!
 }
 */
+
+
+/*
+import java.io.IOException
+
+import android.R
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.DialogInterface.OnClickListener
+import android.net.Uri
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+
+class MyActivity : Activity() {
+
+    */
+/** Called when the activity is first created.  *//*
+
+
+    internal var ctx: Context? = null
+    internal var b: Button? = null
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.main)
+
+        b = findViewById(R.id.test1) as Button
+        ctx = this
+        b!!.setOnClickListener {
+            // TODO Auto-generated method stub
+
+            displayAlert()
+        }
+
+
+    }
+
+    fun displayAlert() {
+
+        val btnOnClick = OnClickListener { dialog, which ->
+            if (which == DialogInterface.BUTTON_POSITIVE) {
+
+
+                AlertDialog.Builder(ctx).setMessage("BUTTON_POSITIVE")
+                    .setTitle("Alert Postive ")
+                    .setCancelable(true)
+                    .setNeutralButton(
+                        android.R.string.ok
+                    ) { dialog, whichButton -> finish() }
+                    .show()
+
+
+            } else if (which == DialogInterface.BUTTON_NEGATIVE) {
+                AlertDialog.Builder(ctx).setMessage("BUTTON_NEGATIVE")
+                    .setTitle("Alert Negative")
+                    .setCancelable(true)
+                    .setNeutralButton(
+                        android.R.string.ok
+                    ) { dialog, whichButton -> finish() }
+                    .show()
+
+            } else if (which == DialogInterface.BUTTON_NEUTRAL) {
+                // More Info
+                AlertDialog.Builder(ctx).setMessage("BUTTON_NEUTRAL")
+                    .setTitle("Alert Neutral")
+                    .setCancelable(true)
+                    .setNeutralButton(
+                        android.R.string.ok
+                    ) { dialog, whichButton -> finish() }
+                    .show()
+            }
+        }
+
+
+        val promptInstall = AlertDialog.Builder(ctx).setTitle("First Alert")
+            .setMessage(
+                "mY First Alert"
+            )
+            .setPositiveButton("OK", btnOnClick).setNegativeButton(
+                "Cancel", btnOnClick
+            ).setNeutralButton(
+                "More Info",
+                btnOnClick
+            ).create()
+
+        promptInstall.show()
+    }
+}*/
+
+// https://api.yelp.com/v3/businesses/search?latitude=38.90218613387796&longitude=-77.0493872836232&radius=1500&categories=movietheaters&location=2224%20F%20St%20NW

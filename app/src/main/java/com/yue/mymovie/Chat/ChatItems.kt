@@ -5,6 +5,7 @@ import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.R
+import com.yue.mymovie.Util
 import kotlinx.android.synthetic.main.chat_from_row.view.*
 import kotlinx.android.synthetic.main.chat_to_row.view.*
 import kotlinx.android.synthetic.main.latest_message_row.view.*
@@ -46,7 +47,7 @@ class ChatToItem(val text:String, val user: User): Item<GroupieViewHolder>() {
     }
 }
 
-class LastMessageItem(val text : String, val  username : String, val uri: String, val timestamp: Long, val readOrNot: Boolean ):Item<GroupieViewHolder>(){
+class LastMessageItem(val text : String, val  chatLog : Util.ChatLog, val selectedUserList : ArrayList<User>, val uri: String, val timestamp: Long, val readOrNot: Boolean ):Item<GroupieViewHolder>(){
     override fun getLayout(): Int {
         return R.layout.latest_message_row
     }
@@ -57,7 +58,7 @@ class LastMessageItem(val text : String, val  username : String, val uri: String
         if (uri != ""){
             Picasso.get().load(uri).into(targetImageView)
         }
-        viewHolder.itemView.username_textview_latest_message.text = username
+        viewHolder.itemView.username_textview_latest_message.text = chatLog.chatLogHeader
     }
 
 }

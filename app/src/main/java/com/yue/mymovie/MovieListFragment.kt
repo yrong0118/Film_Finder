@@ -72,6 +72,7 @@ class MovieListFragment : Fragment() {
                     imaFrontPAth,
                     n,
                     context!!)
+
                 activity?.runOnUiThread{
                     val myAdapter:RecyclerViewAdapter = RecyclerViewAdapter(context!!,moviesList,mCallback)
                     mry.adapter = myAdapter

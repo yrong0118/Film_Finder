@@ -17,6 +17,7 @@
     <string name="youtube_front_path">https://www.youtube.com/embed/</string>
     <string name="no_name_user">values/strings.xml:16</string>
     <string name="page">15</string>
+    <string name="page1">1</string>
     <string name="add_contacts">Add contacts</string>
     <string name="cancle">Cancle</string>
     <string name="confirm">Confirm</string>

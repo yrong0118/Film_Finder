@@ -7,8 +7,10 @@ import androidx.fragment.app.FragmentTransaction
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.Movie
 import com.yue.mymovie.R
+import com.yue.mymovie.Util
 
-class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,NewMessageFragment.ConfirmToChatLognListener {
+class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,NewMessageFragment.ConfirmToChatLognListener,
+    ChatListFragment.OnChatLogSelectListener, ChatLogFragment.OnChatLogGoBackListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +30,32 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
             .commit()
     }
 
-    override fun confirmToChatLogListener(list:ArrayList<User>,groupId:String) {
-        var chatLogFragment = ChatLogFragment.newInstance(list,groupId)
+    override fun confirmToChatLogListener(selectedUserList:ArrayList<User>,chatLog:Util.ChatLog) {
+        var chatLogFragment = ChatLogFragment.newInstance(selectedUserList,chatLog)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,chatLogFragment)
             .addToBackStack(chatLogFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun chatLogSelect(selectedUserList: ArrayList<User>, chatLog: Util.ChatLog) {
+        var chatLogFragment = ChatLogFragment.newInstance(selectedUserList,chatLog)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,chatLogFragment)
+            .addToBackStack(chatLogFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun chatLogGoback() {
+        var chatListFragment = ChatListFragment.newInstance()
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,chatListFragment)
+            .addToBackStack(chatListFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }

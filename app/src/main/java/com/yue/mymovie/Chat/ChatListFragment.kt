@@ -36,11 +36,15 @@ class ChatListFragment : Fragment() {
     lateinit var addCircle:ImageView
 
     lateinit var mCallback: AddGroupChatListener
+    lateinit var mCallbackChatLogSelect: OnChatLogSelectListener
 
     interface AddGroupChatListener {
         fun addGroupChat()
     }
 
+    interface OnChatLogSelectListener {
+        fun chatLogSelect(selectedUserList:ArrayList<User>, chatLog: Util.ChatLog)
+    }
 
     companion object {
         lateinit var recyclerview_latest_messages : RecyclerView
@@ -66,7 +70,6 @@ class ChatListFragment : Fragment() {
         currentUserUid =Util.getCurrentUserUid()
         recyclerview_latest_messages.adapter = adapter
 
-        adapter.clear()
 
 //        currentUser = fetchCurrentUser()
         verifyUserIsLoggedIn()
@@ -77,6 +80,12 @@ class ChatListFragment : Fragment() {
             addCircle = view.findViewById(R.id.ic_add_circle_chat)
             addCircle.setOnClickListener(View.OnClickListener { v -> showMenu(v) })
 
+            adapter.setOnItemClickListener { item, view ->
+                item as LastMessageItem
+                mCallbackChatLogSelect.chatLogSelect(item.selectedUserList,item.chatLog)
+            }
+
+            adapter.clear()
         }
 
 
@@ -89,15 +98,14 @@ class ChatListFragment : Fragment() {
         ref.addChildEventListener(object: ChildEventListener {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) {
                 val listLateMessage = p0.getValue(ListLatestMessage::class.java) ?: return
-                adapter.add(LastMessageItem(listLateMessage.text,listLateMessage.username,listLateMessage.imageUri,listLateMessage.timestamp,listLateMessage.readOrNot))
+                adapter.add(LastMessageItem(listLateMessage.text,listLateMessage.chatLog,listLateMessage.selectedUserList,listLateMessage.imageUri,listLateMessage.timestamp,listLateMessage.readOrNot))
                 adapter.notifyDataSetChanged()
-
 
             }
 
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
                 val listLateMessage = p0.getValue(ListLatestMessage::class.java) ?: return
-                adapter.add(LastMessageItem(listLateMessage.text,listLateMessage.username,listLateMessage.imageUri,listLateMessage.timestamp,listLateMessage.readOrNot))
+                adapter.add(LastMessageItem(listLateMessage.text,listLateMessage.chatLog,listLateMessage.selectedUserList,listLateMessage.imageUri,listLateMessage.timestamp,listLateMessage.readOrNot))
                 adapter.notifyDataSetChanged()
 //                recyclerview_latest_messages.adapter = adapter
             }
@@ -168,6 +176,7 @@ class ChatListFragment : Fragment() {
         try {
             //mCallback initialize
             mCallback = context as AddGroupChatListener
+            mCallbackChatLogSelect = context as OnChatLogSelectListener
         } catch (e: ClassCastException) {
             //
         }

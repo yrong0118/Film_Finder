@@ -19,7 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="160dp"
             android:scaleType="centerCrop"
-            android:background="#2d2d2d" />
+            android:background="#2d2d2d"
+            android:src="@drawable/no_images_available"/>
         <TextView
             android:id="@+id/movie_title"
             android:layout_width="match_parent"

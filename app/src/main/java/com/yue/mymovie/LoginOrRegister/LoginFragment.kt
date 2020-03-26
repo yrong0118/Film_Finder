@@ -80,7 +80,7 @@ class LoginFragment : Fragment() {
         goToRegister = view.findViewById(R.id.back_to_register_textview)
 
         val preferences: SharedPreferences = this.activity!!.getSharedPreferences("mymovie", Context.MODE_PRIVATE)
-        textWatcher
+
         email.setText(preferences.getString("SAVED_USERNAME", ""))
         passWord.setText(preferences.getString("SAVED_PASSWORD",""))
         email.addTextChangedListener(textWatcher!!)
@@ -110,11 +110,11 @@ class LoginFragment : Fragment() {
         Log.d(TAG, "Password is: " + password_edittext_login.text.toString())
         progressBar.visibility = View.VISIBLE
 
-        val inputtedUsername: String = email_edittext_login.text.toString().trim()
+        val inputtedUserEmail: String = email_edittext_login.text.toString().trim()
         val inputtedPassword: String = passWord.text.toString()
 
         firebaseAuth
-            .signInWithEmailAndPassword(inputtedUsername, inputtedPassword)
+            .signInWithEmailAndPassword(inputtedUserEmail, inputtedPassword)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val currentUser: FirebaseUser? = firebaseAuth.currentUser
@@ -124,11 +124,11 @@ class LoginFragment : Fragment() {
                     // Save the inputted username to file
                     preferences
                         .edit()
-                        .putString("SAVED_USERNAME", email.text.toString().trim())
+                        .putString("SAVED_USEREMAIL", inputtedUserEmail)
                         .apply()
                     preferences
                         .edit()
-                        .putString("SAVED_PASSWORD", passWord.text.toString())
+                        .putString("SAVED_PASSWORD", inputtedPassword)
                         .apply()
 
                     val intent = Intent(this.activity, MainActivity::class.java)
@@ -157,7 +157,7 @@ class LoginFragment : Fragment() {
         override fun afterTextChanged(p0: Editable?) {
             if (isResumed){
                 val inputtedUsername: String = email.text.toString().trim()
-                val inputtedPassword: String = passWord.text.toString().trim()
+                val inputtedPassword: String = passWord.text.toString()
                 val enabled: Boolean = inputtedUsername.isNotEmpty() && inputtedPassword.isNotEmpty()
 
                 // Kotlin shorthand for login.setEnabled(enabled)

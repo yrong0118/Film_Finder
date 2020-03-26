@@ -45,7 +45,7 @@ class NewMessageFragment : Fragment() {
 
     interface ConfirmToChatLognListener {
 
-        fun confirmToChatLogListener(list:ArrayList<User>,groupId : String)
+        fun confirmToChatLogListener(selectedUserList:ArrayList<User>,chatLog : Util.ChatLog)
     }
 
     companion object {
@@ -86,34 +86,75 @@ class NewMessageFragment : Fragment() {
 
         recyclerview_newmessage.adapter = adapter
 
+        Util.fetchCurrentUser2 { currentUser ->
+            confirmBtn.setOnClickListener {
+                var chatLog = Util.ChatLog("","")
+                if(selectectedContact.size > 1){
+                    chatLog = createGroupData(selectectedContact,currentUser.username)
 
-        confirmBtn.setOnClickListener {
-            var groupOrSingleId : String ?= ""
-            if(selectectedContact.size > 1){
-                var groupId = createGroupData(selectectedContact)
-                groupOrSingleId = groupId
+                } else {
+                    chatLog.chatLogId = getTwoPersonChatId(currentUserUid, selectectedContact.get(0).uid)
+                    chatLog.chatLogHeader = selectectedContact.get(0).username
+//                    CheckSingleData(chatLog.chatLogId){
+//                        if (!it.contains(chatLog.chatLogId)){
+//                            createSingleData(chatLog.chatLogId,selectectedContact.get(0).uid,currentUserUid)
+//                        }
+//                    }
+                }
 
-            } else {
-                groupOrSingleId = CheckSingleData(selectectedContact.get(0).uid)
+                mCallback.confirmToChatLogListener(selectectedContact,chatLog!!)
+
             }
-
-            mCallback.confirmToChatLogListener(selectectedContact,groupOrSingleId!!)
-
         }
+
+
         return view
     }
 
-    private fun CheckSingleData(toUserId : String):String{
+    fun CheckSingleData(chatLogId : String, chatLogIdSet: (Set<String>) -> Unit = {
+
+
+        val chatIdRef = FirebaseDatabase.getInstance().getReference("${Util.LISTS}/${currentUserUid}")
+
+        chatIdRef.orderByChild("groupOrTwoPersonChatId").equalTo(chatLogId).addChildEventListener(object:
+            ChildEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+
+            }
+
+            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+
+                val latestMessage = dataSnapshot.getValue(ListLatestMessage::class.java)
+                println(dataSnapshot.getKey() + " was " + latestMessage!!.chatLog.chatLogId + " has create the single chat.")
+                it.plus(latestMessage.chatLog.chatLogId)
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot) {
+
+            }
+
+        })
+
+    }){
+
+    }
+
+    private fun searchAllSingleGroupId(toUserId : String){
+
 
         val twoPersonChatId = getTwoPersonChatId(currentUserUid, toUserId)
 
-
-        createSingleData(twoPersonChatId,toUserId, currentUserUid)
-
-        return twoPersonChatId
+        var chatLogIdSet = setOf<String>()
 
         val chatIdRef = FirebaseDatabase.getInstance().getReference("${Util.LISTS}/${currentUserUid}")
-        var isHas = false
 
         chatIdRef.orderByChild("groupOrTwoPersonChatId").equalTo(twoPersonChatId).addChildEventListener(object:
             ChildEventListener {
@@ -132,9 +173,8 @@ class NewMessageFragment : Fragment() {
             override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
 
                 val latestMessage = dataSnapshot.getValue(ListLatestMessage::class.java)
-                println(dataSnapshot.getKey() + " was " + latestMessage!!.groupOrTwoPersonChatId + " has create the single chat.")
-                isHas = true
-                return
+                println(dataSnapshot.getKey() + " was " + latestMessage!!.chatLog.chatLogId + " has create the single chat.")
+                chatLogIdSet.plus(latestMessage.chatLog.chatLogId)
             }
 
             override fun onChildRemoved(p0: DataSnapshot) {
@@ -143,15 +183,9 @@ class NewMessageFragment : Fragment() {
 
         })
 
-        if(!isHas){
-            createSingleData(twoPersonChatId,toUserId, currentUserUid)
-        }
-
-        return twoPersonChatId
-
     }
 
-    private fun createSingleData(twoPersonChatId : String,toUserId: String,froUserId: String){
+    private fun createSingleData(twoPersonChatId : String,toUserId: String,froUserId: String, selectectedContact:ArrayList<User>){
         val reference = FirebaseDatabase.getInstance().getReference("/${Util.TWOPERSONCHATS}/$twoPersonChatId")
         var memberList = arrayListOf<String>()
         memberList.add(toUserId)
@@ -165,7 +199,7 @@ class NewMessageFragment : Fragment() {
 
         val referenceCreater = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUserUid}/${twoPersonChatId}")
         Util.fetchUser(toUserId){toUser ->
-            val listLatestMessage = ListLatestMessage(twoPersonChatId, toUser.username,
+            val listLatestMessage = ListLatestMessage(Util.ChatLog(twoPersonChatId, toUser.username),selectectedContact,
                 toUser.profileImageUrl,"",true,System.currentTimeMillis() / 1000)
             referenceCreater.setValue(listLatestMessage)
                 .addOnSuccessListener {
@@ -198,7 +232,9 @@ class NewMessageFragment : Fragment() {
         return ""
     }
 
-    private fun createGroupData(selctectedContact:ArrayList<User>): String{
+    private fun createGroupData(selctectedContact:ArrayList<User>, currentUserName: String): Util.ChatLog {
+        var chatLog = Util.ChatLog()
+        chatLog.chatLogHeader = getLogChatHead(selctectedContact,currentUserName)
         val reference = FirebaseDatabase.getInstance().getReference("/${Util.GROUPCHATS}").push()
         val groups = GroupsChat(reference.key!!,currentUserUid, getGroupMember(selctectedContact))
         reference.setValue(groups)
@@ -207,13 +243,16 @@ class NewMessageFragment : Fragment() {
             }
         val referenceCreater = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUserUid}/${reference.key!!}")
 
-        val listLatestMessage = ListLatestMessage(reference.key!!,getLogChatHead(selctectedContact),"","",true,System.currentTimeMillis() / 1000)
+        val listLatestMessage = ListLatestMessage(Util.ChatLog(reference.key!!,chatLog.chatLogHeader),selctectedContact,"","",true,System.currentTimeMillis() / 1000)
 
         referenceCreater.setValue(listLatestMessage)
             .addOnSuccessListener {
                 Log.d(TAG, "Saved the group on the creater list: ${referenceCreater.key}")
             }
-        return reference.key!!
+        chatLog.chatLogId = reference.key!!
+
+
+        return chatLog
     }
 
     private fun getGroupMember(selectectedContact: ArrayList<User>): ArrayList<String> {
@@ -222,7 +261,7 @@ class NewMessageFragment : Fragment() {
         iterator.forEach{
             result.add(it.uid)
         }
-        return result;
+        return result
     }
 
 
