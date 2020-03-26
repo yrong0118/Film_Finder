@@ -9,6 +9,8 @@ import com.yue.mymovie.Util
 import kotlinx.android.synthetic.main.chat_from_row.view.*
 import kotlinx.android.synthetic.main.chat_to_row.view.*
 import kotlinx.android.synthetic.main.latest_message_row.view.*
+import kotlinx.android.synthetic.main.vote_from_row.view.*
+import kotlinx.android.synthetic.main.vote_to_row.view.*
 import java.sql.Timestamp
 
 class ChatFromItem(val text:String, val user: User): Item<GroupieViewHolder>() {
@@ -46,6 +48,42 @@ class ChatToItem(val text:String, val user: User): Item<GroupieViewHolder>() {
         return R.layout.chat_to_row
     }
 }
+
+
+class VoteFromItem(val user: User): Item<GroupieViewHolder>() {
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        val uri = user.profileImageUrl
+        val targetImageView = viewHolder.itemView.imageview_from_row_vote
+        if (uri != ""){
+            Picasso.get().load(uri).into(targetImageView)
+        }
+
+    }
+
+
+    override fun getLayout(): Int {
+        return R.layout.vote_from_row
+    }
+}
+
+
+class VoteToItem(val user: User): Item<GroupieViewHolder>() {
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        // load our user image into the star
+        val uri = user.profileImageUrl
+        val targetImageView = viewHolder.itemView.imageview_to_row_vote
+        if (uri != ""){
+            Picasso.get().load(uri).into(targetImageView)
+        }
+
+    }
+
+
+    override fun getLayout(): Int {
+        return R.layout.vote_to_row
+    }
+}
+
 
 class LastMessageItem(val text : String, val  chatLog : Util.ChatLog, val selectedUserList : ArrayList<User>, val uri: String, val timestamp: Long, val readOrNot: Boolean ):Item<GroupieViewHolder>(){
     override fun getLayout(): Int {

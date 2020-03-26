@@ -25,6 +25,7 @@ class Util {
         val TWOPERSONCHATS= "TwoPersonChats"
         val LISTS = "Lists"
         val USERS = "users"
+        val MOVIELIST = "movieVoteLists"
         fun isStringEmpty(str:String):Boolean{
             return (str == null || str.length == 0)
         }
@@ -135,6 +136,7 @@ class Util {
     ){
         constructor():this("", "")
     }
+
 
 
 }

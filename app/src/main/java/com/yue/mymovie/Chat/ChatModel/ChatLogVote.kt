@@ -20,24 +20,26 @@ class ChatLogVote {
         val TAG = "ChatLogVote"
         var chatLogId = ChatLogFragment.chatLogId
 
-        fun performSendVoteToGroup(selectedList: ArrayList<User>,currentUser: User,startVoteTimeStamp: Long,endVoteTimestamp: Long) {
+        fun performSendVoteToGroup(selectedList: ArrayList<User>,movieVoteItemSelectedList: ArrayList<MovieByKW>, currentUser: User,startVoteTimeStamp: Long,endVoteTimestamp: Long) {
             // how do we actually send a message to firebase...
             if (currentUserUID == "") return
-            val voteMovieIdList = getMovieVoteList(ChatLogFragment.selectedVoteMovieList)
+            val voteMovieIdList = getMovieVoteList(movieVoteItemSelectedList)
             var waitVoteUserList = getWaitVoteUserList(selectedList)
             val voteRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}").push()
             val chatVote = ChatVote(voteRef.key!!, currentUserUID,waitVoteUserList,startVoteTimeStamp,endVoteTimestamp)
             voteRef.setValue(chatVote)
+                    //*******************************************
                 .addOnSuccessListener {
+                    Log.d(TAG, "waitList Size: ${waitVoteUserList.size}")
+                    Log.d(TAG, "voteMovieIdList: ${voteMovieIdList.size}")
                     Log.d(TAG, "Saved our chat message in the message table(group): ${voteRef.key}")
 
                     for (i in 0 until voteMovieIdList.size) {
-                        val voteMovieRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}")
-                        voteMovieRef.setValue(0).addOnSuccessListener {
-                            Log.d(TAG, "Saved our MovieId list in the vote table(group): ${voteMovieRef.key}")
+                        var voteMovieListRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/${Util.MOVIELIST}/${voteMovieIdList[i].movieId}")
+                        voteMovieListRef.setValue(0).addOnSuccessListener {
+                            Log.d(TAG, "Saved our MovieId list in the vote table(group): ${voteMovieListRef.key}")
                         }
                     }
-
 
                 }
             val groupRef = FirebaseDatabase.getInstance()
@@ -147,14 +149,14 @@ class ChatLogVote {
 //
 //        }
 
-        private fun getMovieVoteList(voteMovieList: ArrayList<MovieByKW>): ArrayList<String> {
-            var list = arrayListOf<String>()
+        private fun getMovieVoteList(voteMovieList: ArrayList<MovieByKW>): ArrayList<MovieVote> {
+            var list = arrayListOf<MovieVote>()
             val set = setOf<String>()
             for (i in 0 until voteMovieList.size){
                 val current = voteMovieList.get(i).movieId
                 if (!set.contains(current)) {
                     set.plus(voteMovieList.get(i).movieId)
-                    list.plus(current)
+                    list.add(MovieVote(current,0))
                 }
             }
             return list
@@ -183,7 +185,7 @@ class ChatLogVote {
         private fun getWaitVoteUserList(selectedList: ArrayList<User>): ArrayList<String> {
             var list = arrayListOf<String>()
             for (i in 0 until selectedList.size) {
-                list.plus(selectedList.get(i).uid)
+                list.add(selectedList[i].uid)
             }
             return list
         }

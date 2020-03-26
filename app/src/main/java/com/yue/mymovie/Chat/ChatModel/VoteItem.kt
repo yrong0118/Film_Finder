@@ -45,3 +45,4 @@ class VoteItem(val movie: MovieByKW): Item<GroupieViewHolder>(){
     }
 
 }
+

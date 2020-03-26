@@ -30,12 +30,6 @@ class MessageType (
 }
 
 
-class ChatTtpe (
-    val ChatType : String,
-    var GroupOrTwoPersonId: String
-){
-    constructor():this("","")
-}
 
 class ListLatestMessage(
     val chatLog : Util.ChatLog,

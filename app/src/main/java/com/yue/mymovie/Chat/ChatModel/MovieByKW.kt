@@ -23,3 +23,9 @@ data class MovieByKWVote(
 
     constructor() : this("", "", "",false)
 }
+
+data class MovieVote(
+    val movieId: String,
+    var supportNum: Int) {
+    constructor(): this("", 0)
+}

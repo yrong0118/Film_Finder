@@ -193,10 +193,7 @@ class ChatLogFragment : Fragment() {
                             override fun onChildChanged(p0: DataSnapshot, p1: String?) {
 
                                 val chatMessage = dataSnapshot.getValue(ChatMessage::class.java)
-                                if (chatMessage != null && chatMessage.messageId.equals(
-                                        messageOrVote.messageId
-                                    )
-                                ) {
+                                if (chatMessage != null && chatMessage.messageId.equals(messageOrVote.messageId)) {
                                     Log.d(TAG, "chatMessage!!.messageId(changed): ${chatMessage!!.messageId}")
                                     if (chatMessage.sendUserId.equals(currentUserUID)) {
                                         chatAdapter.add(
@@ -236,6 +233,72 @@ class ChatLogFragment : Fragment() {
                                             chatAdapter.add(
                                                 ChatToItem(
                                                     chatMessage.text,
+                                                    chatToUser
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+
+                            }
+
+                        })
+                    }
+                    else if (messageOrVote.messageType == Util.VOTE) {
+//                        Log.d(TAG, " messageOrVote!!.messageId: ${messageOrVote!!.messageId}")
+
+                        val messRef =
+                            FirebaseDatabase.getInstance().getReference("/${Util.VOTES}")
+                        messRef.addChildEventListener(object : ChildEventListener {
+                            override fun onChildRemoved(p0: DataSnapshot) {
+
+                            }
+
+                            override fun onCancelled(p0: DatabaseError) {
+
+                            }
+
+                            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+
+                            }
+
+                            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+
+                                val voteMessage = dataSnapshot.getValue(VoteMessage::class.java)
+                                if (voteMessage != null && voteMessage.voteId.equals(messageOrVote.messageId)) {
+                                    Log.d(TAG, "voteMessage!!.messageId(changed): ${voteMessage!!.voteId}")
+                                    if (voteMessage.sendUserId.equals(currentUserUID)) {
+                                        chatAdapter.add(
+                                            VoteFromItem(
+                                                currentUser
+                                            )
+                                        )
+                                    } else {
+                                        Util.fetchUser(voteMessage.sendUserId) { chatToUser ->
+                                            chatAdapter.add(
+                                                VoteToItem(
+                                                    chatToUser
+                                                )
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+                                val voteMessage = dataSnapshot.getValue(VoteMessage::class.java)
+                                if (voteMessage != null && voteMessage.voteId.equals(messageOrVote.messageId)) {
+                                    Log.d(TAG, "voteMessage!!.messageId(changed): ${voteMessage!!.voteId}")
+                                    if (voteMessage.sendUserId.equals(currentUserUID)) {
+                                        chatAdapter.add(
+                                            VoteFromItem(
+                                                currentUser
+                                            )
+                                        )
+                                    } else {
+                                        Util.fetchUser(voteMessage.sendUserId) { chatToUser ->
+                                            chatAdapter.add(
+                                                VoteToItem(
                                                     chatToUser
                                                 )
                                             )

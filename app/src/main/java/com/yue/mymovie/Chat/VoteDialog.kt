@@ -29,6 +29,7 @@ class VoteDialog {
         val TAG = "ChatVoteDialog"
         var selectedList = ChatLogFragment.selectedList
         var movieVoteItemSelectedList :ArrayList<MovieByKW> = arrayListOf()
+        var selectedMovieList = arrayListOf<MovieByKW>()
 
         val currentUserUID = ChatLogFragment.currentUserUID
         var chatLogId = ChatLogFragment.chatLogId
@@ -39,7 +40,6 @@ class VoteDialog {
         var imgFrontPath: String = ""
 
         fun showVoteMovieDialog(cxt: Context,movieList:ArrayList<MovieByKW>,key:String, p: String, path: String) {
-            selectedVoteMovieList = movieList
             context = cxt
             api = key
             page = p
@@ -100,8 +100,10 @@ class VoteDialog {
     //                      performSendVoteToSingle(selectedList, currentUser,timestamp,timestamp)
 
                     } else {
+                        val waitinglist = selectedList
                         Log.d(TAG, "Attempt to send message.... to the group")
-                        performSendVoteToGroup(selectedList, currentUser,timestamp, timestamp)
+                        Log.d(TAG, "movieVoteItemSelectedList length : ${movieVoteItemSelectedList.size}")
+                        performSendVoteToGroup(waitinglist, movieVoteItemSelectedList,currentUser,timestamp, timestamp)
                     }
                     ChatLogFragment.adapterMovieSearchByKW.clear()
                     ChatLogFragment.adapternewVote.clear()
@@ -159,25 +161,31 @@ class VoteDialog {
                 dialogInterface.dismiss()
                 showVoteMovieDialog(context!!,selectedVoteMovieList, api, page, imgFrontPath)
                 ChatLogFragment.adapterMovieSearchByKW.clear()
+                selectedMovieList.clear()
             }
             dialog.setNeutralButton("CANCEL"){ dialogInterface, i ->
                 dialogInterface.dismiss()
                 ChatLogFragment.adapterMovieSearchByKW.clear()
                 ChatLogFragment.adapternewVote.clear()
                 selectedVoteMovieList.clear()
+                selectedMovieList.clear()
 
             }
 
             dialog.setPositiveButton(
                 "CONFIRM"
             ) { dialogInterface, i ->
+                for (i in 0 until selectedMovieList.size) {
+                    movieVoteItemSelectedList.add(selectedMovieList[i])
+                }
                 for (i in 0 until movieVoteItemSelectedList.size){
                     ChatLogFragment.adapternewVote.add(VoteItem(movieVoteItemSelectedList.get(i)))
                 }
-                movieVoteItemSelectedList.clear()
                 dialogInterface.dismiss()
                 showVoteMovieDialog(context!!,selectedVoteMovieList, api, page, imgFrontPath)
-                ChatLogFragment.adapterMovieSearchByKW.clear() }
+                ChatLogFragment.adapterMovieSearchByKW.clear()
+                selectedMovieList.clear()
+            }
 
             dialog.show()
         }
@@ -260,16 +268,15 @@ class VoteDialog {
 
                 item as VoteItemSelected
 
-                var  iterator = movieVoteItemSelectedList.iterator()
-
+                var  iterator = selectedMovieList.iterator()
 
                 if (item.movie.selected){
                     item.movie.selected = false
-                    if(movieVoteItemSelectedList!= null){
+                    if(selectedMovieList!= null){
                         iterator.forEach {
                             if ( it.movieId.equals(item.movie.movieId)){
                                 iterator.remove()
-                                Log.d(TAG,"selectedContacts length = ${movieVoteItemSelectedList.size}")
+                                Log.d(TAG,"selectedContacts length = ${selectedMovieList.size}")
                                 Log.d(TAG,"item movieName = ${item.movie.movieName} + ${item.movie.selected}")
                             }
                         }
@@ -279,8 +286,8 @@ class VoteDialog {
 
                 } else {
                     item.movie.selected = true
-                    movieVoteItemSelectedList.add(MovieByKW(item.movie.movieName,item.movie.movieId,item.movie.movieImageUrl))
-                    Log.d(TAG,"selectedContacts length = ${movieVoteItemSelectedList.size}")
+                    selectedMovieList.add(MovieByKW(item.movie.movieName,item.movie.movieId,item.movie.movieImageUrl))
+                    Log.d(TAG,"selectedContacts length = ${selectedMovieList.size}")
                     Log.d(TAG,"item movieName = ${item.movie.movieName} + ${item.movie.selected}")
                     ChatLogFragment.adapterMovieSearchByKW.notifyDataSetChanged()
                 }
