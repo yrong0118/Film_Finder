@@ -1,5 +1,7 @@
 package com.yue.mymovie.Chat
 
+import android.util.Log
+import android.widget.TextView
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
@@ -41,6 +43,7 @@ class ChatToItem(val text:String, val user: User): Item<GroupieViewHolder>() {
             Picasso.get().load(uri).into(targetImageView)
         }
 
+
     }
 
 
@@ -56,6 +59,11 @@ class VoteFromItem(val user: User): Item<GroupieViewHolder>() {
         val targetImageView = viewHolder.itemView.imageview_from_row_vote
         if (uri != ""){
             Picasso.get().load(uri).into(targetImageView)
+        }
+        val voteView:TextView = viewHolder.itemView.text_from_row_vote
+
+        voteView.setOnClickListener {
+            Log.d("VoteItem","click VoteFromItem")
         }
 
     }
@@ -74,6 +82,11 @@ class VoteToItem(val user: User): Item<GroupieViewHolder>() {
         val targetImageView = viewHolder.itemView.imageview_to_row_vote
         if (uri != ""){
             Picasso.get().load(uri).into(targetImageView)
+        }
+
+        val voteView = viewHolder.itemView.text_to_row_vote
+        voteView.setOnClickListener {
+            Log.d("VoteItem","click VoteToItem")
         }
 
     }

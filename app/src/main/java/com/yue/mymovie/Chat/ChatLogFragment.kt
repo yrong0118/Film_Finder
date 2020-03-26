@@ -105,6 +105,7 @@ class ChatLogFragment : Fragment() {
         recyclerView.adapter = chatAdapter
 
 
+
         goBackToChatList.setOnClickListener {
             chatAdapter.clear()
             mCallbackToChat.chatLogGoback()
