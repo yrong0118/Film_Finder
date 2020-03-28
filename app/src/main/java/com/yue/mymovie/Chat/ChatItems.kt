@@ -5,6 +5,7 @@ import android.widget.TextView
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import com.yue.mymovie.Chat.ChatLogFragment.Companion.chatAdapter
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
@@ -15,6 +16,11 @@ import kotlinx.android.synthetic.main.vote_from_row.view.*
 import kotlinx.android.synthetic.main.vote_to_row.view.*
 import java.sql.Timestamp
 
+interface ChatlogToVoteShowListener {
+    fun catLogToVoteShow(list: ArrayList<User>, chatLog: Util.ChatLog,voteID: String)
+}
+
+
 class ChatFromItem(val text:String, val user: User): Item<GroupieViewHolder>() {
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         viewHolder.itemView.textview_from_row.text =text
@@ -23,6 +29,8 @@ class ChatFromItem(val text:String, val user: User): Item<GroupieViewHolder>() {
         val targetImageView = viewHolder.itemView.imageview_chat_from_row
         if (uri != ""){
             Picasso.get().load(uri).into(targetImageView)
+        } else{
+            Picasso.get().load(R.drawable.unnamed).into(targetImageView)
         }
 
     }
@@ -41,6 +49,8 @@ class ChatToItem(val text:String, val user: User): Item<GroupieViewHolder>() {
         val targetImageView = viewHolder.itemView.imageview_chat_to_row
         if (uri != ""){
             Picasso.get().load(uri).into(targetImageView)
+        }else{
+            Picasso.get().load(R.drawable.unnamed).into(targetImageView)
         }
 
 
@@ -53,7 +63,7 @@ class ChatToItem(val text:String, val user: User): Item<GroupieViewHolder>() {
 }
 
 
-class VoteFromItem(val user: User): Item<GroupieViewHolder>() {
+class VoteFromItem(val selectedList: ArrayList<User>, val chatLog: Util.ChatLog, val user: User, val voteId:String): Item<GroupieViewHolder>() {
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         val uri = user.profileImageUrl
         val targetImageView = viewHolder.itemView.imageview_from_row_vote
@@ -64,6 +74,8 @@ class VoteFromItem(val user: User): Item<GroupieViewHolder>() {
 
         voteView.setOnClickListener {
             Log.d("VoteItem","click VoteFromItem")
+            ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+            chatAdapter.clear()
         }
 
     }
@@ -75,7 +87,7 @@ class VoteFromItem(val user: User): Item<GroupieViewHolder>() {
 }
 
 
-class VoteToItem(val user: User): Item<GroupieViewHolder>() {
+class VoteToItem(val selectedList: ArrayList<User>, val chatLog: Util.ChatLog, val user: User, val voteId:String): Item<GroupieViewHolder>() {
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
         // load our user image into the star
         val uri = user.profileImageUrl
@@ -87,6 +99,8 @@ class VoteToItem(val user: User): Item<GroupieViewHolder>() {
         val voteView = viewHolder.itemView.text_to_row_vote
         voteView.setOnClickListener {
             Log.d("VoteItem","click VoteToItem")
+            ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+            chatAdapter.clear()
         }
 
     }

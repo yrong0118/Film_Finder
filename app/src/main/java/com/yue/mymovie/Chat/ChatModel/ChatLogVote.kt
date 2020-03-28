@@ -7,6 +7,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.yue.mymovie.Chat.ChatLogFragment
 import com.yue.mymovie.Chat.VoteDialog
 import com.yue.mymovie.Chat.VoteModel.ChatVote
+import com.yue.mymovie.Chat.VoteModel.VoteMovieGrade
+import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
@@ -26,7 +28,7 @@ class ChatLogVote {
             val voteMovieIdList = getMovieVoteList(movieVoteItemSelectedList)
             var waitVoteUserList = getWaitVoteUserList(selectedList)
             val voteRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}").push()
-            val chatVote = ChatVote(voteRef.key!!, currentUserUID,waitVoteUserList,startVoteTimeStamp,endVoteTimestamp)
+            val chatVote = ChatVote(voteRef.key!!, currentUserUID,startVoteTimeStamp,endVoteTimestamp)
             voteRef.setValue(chatVote)
                     //*******************************************
                 .addOnSuccessListener {
@@ -34,10 +36,18 @@ class ChatLogVote {
                     Log.d(TAG, "voteMovieIdList: ${voteMovieIdList.size}")
                     Log.d(TAG, "Saved our chat message in the message table(group): ${voteRef.key}")
 
+                    for (i in  0 until waitVoteUserList.size){
+                        val voteWaitingListRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/waiteVoteUserId").push()
+                        voteWaitingListRef.setValue(waitVoteUserList[i]).addOnSuccessListener {
+                            Log.d(TAG, "Saved our WaitVoteUserID list in the vote table(group): ${voteWaitingListRef.key}")
+                        }
+                    }
+
+
                     for (i in 0 until voteMovieIdList.size) {
-                        var voteMovieListRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/${Util.MOVIELIST}/${voteMovieIdList[i].movieId}")
-                        voteMovieListRef.setValue(0).addOnSuccessListener {
-                            Log.d(TAG, "Saved our MovieId list in the vote table(group): ${voteMovieListRef.key}")
+                        val voteMovieGradeRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/movieVoteGrade").push()
+                        voteMovieGradeRef.setValue(voteMovieIdList[i]).addOnSuccessListener {
+                            Log.d(TAG, "Saved our MovieId list in the vote table(group): ${voteMovieGradeRef.key}")
                         }
                     }
 
@@ -56,7 +66,7 @@ class ChatLogVote {
                     chatLayout.recyclerview_chat_log.scrollToPosition(ChatLogFragment.chatAdapter.itemCount - 1)
                 }
 
-            addListOnGroupMember(chatLogId!!, text, selectedList, startVoteTimeStamp)
+            addListOnGroupMember(chatLogId!!, text, selectedList, startVoteTimeStamp,currentUser)
         }
 
 
@@ -64,12 +74,13 @@ class ChatLogVote {
             groupID: String,
             text: String,
             selectedList: ArrayList<User>,
-            timestamp: Long
+            timestamp: Long,
+            currentUser:User
         ) {
 
             var iterator = selectedList.iterator()
             var memberRef: DatabaseReference? = null
-            updateSenderMessageList(groupID, "", text, timestamp)
+            updateSenderMessageList(groupID, "", text, timestamp,currentUser)
 
             iterator.forEach {
                 memberRef =
@@ -96,13 +107,12 @@ class ChatLogVote {
             chatLogId: String,
             imageUri: String,
             text: String,
-            timestamp: Long
+            timestamp: Long,
+            currentUser:User
         ) {
 
             val memberRef = FirebaseDatabase.getInstance()
-                .getReference("/${Util.LISTS}/${ChatLogFragment.currentUserUID}/${chatLogId}")
-
-            chatLogId
+                .getReference("/${Util.LISTS}/${currentUser.uid}/${chatLogId}")
             ChatLogFragment.chatLogHeader!!
             var latestMessage = ListLatestMessage(Util.ChatLog(chatLogId, ChatLogFragment.chatLogHeader!!),
                 ChatLogFragment.selectedList, imageUri, text, true, timestamp)
@@ -149,14 +159,14 @@ class ChatLogVote {
 //
 //        }
 
-        private fun getMovieVoteList(voteMovieList: ArrayList<MovieByKW>): ArrayList<MovieVote> {
-            var list = arrayListOf<MovieVote>()
+        private fun getMovieVoteList(voteMovieList: ArrayList<MovieByKW>): ArrayList<VoteMovieGrade> {
+            var list = arrayListOf<VoteMovieGrade>()
             val set = setOf<String>()
             for (i in 0 until voteMovieList.size){
                 val current = voteMovieList.get(i).movieId
                 if (!set.contains(current)) {
                     set.plus(voteMovieList.get(i).movieId)
-                    list.add(MovieVote(current,0))
+                    list.add(VoteMovieGrade(current,0))
                 }
             }
             return list
@@ -182,10 +192,10 @@ class ChatLogVote {
             return set
         }
 
-        private fun getWaitVoteUserList(selectedList: ArrayList<User>): ArrayList<String> {
-            var list = arrayListOf<String>()
+        private fun getWaitVoteUserList(selectedList: ArrayList<User>): ArrayList<WaitVoteUser> {
+            var list = arrayListOf<WaitVoteUser>()
             for (i in 0 until selectedList.size) {
-                list.add(selectedList[i].uid)
+                list.add(WaitVoteUser(selectedList[i].uid))
             }
             return list
         }

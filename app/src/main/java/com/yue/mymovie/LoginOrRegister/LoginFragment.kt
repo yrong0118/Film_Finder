@@ -62,11 +62,11 @@ class LoginFragment : Fragment() {
             if (textWatcher != null) {
                 email.removeTextChangedListener(textWatcher)
                 passWord.removeTextChangedListener(textWatcher)
-                textWatcher = null;
+                textWatcher = null
             }
         }
-
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

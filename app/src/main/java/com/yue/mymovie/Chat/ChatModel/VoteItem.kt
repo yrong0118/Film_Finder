@@ -9,6 +9,7 @@ import kotlinx.android.synthetic.main.selected_movie_new_vote_row.view.*
 import kotlinx.android.synthetic.main.selected_movie_new_vote_row.view.imageview_new_vote
 import kotlinx.android.synthetic.main.selected_movie_new_vote_row.view.movie_name_textview_new_vote
 import kotlinx.android.synthetic.main.selected_movie_new_vote_row_selected.view.*
+import kotlinx.android.synthetic.main.vote_movie_list_row.view.*
 
 class VoteItemSelected(val movie: MovieByKWVote): Item<GroupieViewHolder>(){
     override fun getLayout(): Int {
@@ -46,3 +47,24 @@ class VoteItem(val movie: MovieByKW): Item<GroupieViewHolder>(){
 
 }
 
+
+class VoteMovieItem (val movie: MovieByKW, val fullGrade:Int): Item<GroupieViewHolder>(){
+    override fun getLayout(): Int {
+        return R.layout.vote_movie_list_row
+    }
+
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.movie_name_textview_vote_movie_list_row.text = movie.movieName
+        viewHolder.itemView.movie_full_grade_vote_movie_list_row.text = " Out of ${fullGrade}"
+        viewHolder.itemView.movie_grade_vote_movie_list_row.text = movie.movieGrade.toString()
+        val targetImageView = viewHolder.itemView.imageview_vote_movie_list_row
+
+        if (movie.movieImageUrl != ""){
+            Picasso.get().load(movie.movieImageUrl).into(targetImageView)
+        } else {
+            Picasso.get().load(R.drawable.no_images_available).into(targetImageView)
+        }
+
+    }
+
+}

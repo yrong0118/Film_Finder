@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
-androidExtensions{
+androidExtensions {
     experimental = true
 }
 
@@ -46,8 +46,8 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation "com.squareup.retrofit2:converter-gson:2.6.2"
 
-    compile 'com.miguelcatalan:materialsearchview:1.4.0'
-    
+    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+
     implementation 'com.squareup.okhttp3:okhttp:4.1.0'
 
 // For logging request / responses to console

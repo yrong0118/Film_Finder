@@ -7,9 +7,10 @@ data class MovieByKW(
     var movieName: String,
     @SerializedName("id")
     val movieId: String,
-    var movieImageUrl: String
+    var movieImageUrl: String,
+    var movieGrade: Int
 ) {
-    constructor() : this("", "", "")
+    constructor() : this("", "", "",0)
 }
 
 data class MovieByKWVote(
@@ -22,10 +23,4 @@ data class MovieByKWVote(
 ) {
 
     constructor() : this("", "", "",false)
-}
-
-data class MovieVote(
-    val movieId: String,
-    var supportNum: Int) {
-    constructor(): this("", 0)
 }

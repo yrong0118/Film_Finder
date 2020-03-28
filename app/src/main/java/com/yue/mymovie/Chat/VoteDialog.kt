@@ -30,8 +30,6 @@ class VoteDialog {
         var selectedList = ChatLogFragment.selectedList
         var movieVoteItemSelectedList :ArrayList<MovieByKW> = arrayListOf()
         var selectedMovieList = arrayListOf<MovieByKW>()
-
-        val currentUserUID = ChatLogFragment.currentUserUID
         var chatLogId = ChatLogFragment.chatLogId
         var selectedVoteMovieList: ArrayList<MovieByKW> = arrayListOf()
         var context: Context? = null
@@ -221,7 +219,7 @@ class VoteDialog {
                     var movieName = movieSelectedResponse.results.get(i).movieName
                     var movieId = movieSelectedResponse.results.get(i).movieId
                     var movieImageUrl = ""
-                    var movieByKW = MovieByKW(movieName,movieId,movieImageUrl)
+                    var movieByKW = MovieByKW(movieName,movieId,movieImageUrl,0)
                     var movieByKWVote = MovieByKWVote(movieName,movieId,movieImageUrl,false)
                     movieIdList.add(movieByKW)
                     getMovieImgData(movieByKWVote,movieId,recyclerMovieByKWView)
@@ -286,7 +284,7 @@ class VoteDialog {
 
                 } else {
                     item.movie.selected = true
-                    selectedMovieList.add(MovieByKW(item.movie.movieName,item.movie.movieId,item.movie.movieImageUrl))
+                    selectedMovieList.add(MovieByKW(item.movie.movieName,item.movie.movieId,item.movie.movieImageUrl,0))
                     Log.d(TAG,"selectedContacts length = ${selectedMovieList.size}")
                     Log.d(TAG,"item movieName = ${item.movie.movieName} + ${item.movie.selected}")
                     ChatLogFragment.adapterMovieSearchByKW.notifyDataSetChanged()

@@ -63,16 +63,22 @@ class ChatLogFragment : Fragment() {
     lateinit var moreChatLog: ImageView
 
 
+
+
     companion object {
         var selectedVoteMovieList: ArrayList<MovieByKW> = arrayListOf()
         var selectedList = arrayListOf<User>()
         var chatLogId: String? = ""
         var chatLogHeader: String? = ""
         val TAG = "ChatLog Frafment"
+        var chatLog: Util.ChatLog? = null
+        lateinit var mCallbackToVoteShow: ChatlogToVoteShowListener
 
-        fun newInstance(list: ArrayList<User>, chatLog: Util.ChatLog): ChatLogFragment {
-            chatLogId = chatLog.chatLogId
-            chatLogHeader = chatLog.chatLogHeader
+
+        fun newInstance(list: ArrayList<User>, chatlog: Util.ChatLog): ChatLogFragment {
+            chatLog =chatlog
+            chatLogId = chatlog.chatLogId
+            chatLogHeader = chatlog.chatLogHeader
             selectedList = list
             var args = Bundle()
             var fragment = ChatLogFragment()
@@ -80,7 +86,6 @@ class ChatLogFragment : Fragment() {
             return fragment
         }
 
-        val currentUserUID = Util.getCurrentUserUid()
         var chatAdapter = GroupAdapter<GroupieViewHolder>()
         var adapternewVote = GroupAdapter<GroupieViewHolder>()
         var adapterMovieSearchByKW = GroupAdapter<GroupieViewHolder>()
@@ -90,6 +95,23 @@ class ChatLogFragment : Fragment() {
         fun chatLogGoback()
     }
 
+    override fun onResume() {
+        super.onResume()
+        chatAdapter.clear()
+        recyclerView.adapter = chatAdapter
+    }
+
+    override fun onStart() {
+        super.onStart()
+        chatAdapter.clear()
+        recyclerView.adapter = chatAdapter
+    }
+
+    override fun onStop() {
+        super.onStop()
+        chatAdapter.clear()
+        recyclerView.adapter = chatAdapter
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,7 +124,7 @@ class ChatLogFragment : Fragment() {
         goBackToChatList = view.findViewById(R.id.ic_go_back_Logchat)
         sendMessage = view.findViewById(R.id.send_button_chat_log)
 
-        recyclerView.adapter = chatAdapter
+
 
 
 
@@ -112,6 +134,7 @@ class ChatLogFragment : Fragment() {
         }
         chatAdapter.clear()
 
+        recyclerView.adapter = chatAdapter
 //        setDummyData()
         Util.fetchCurrentUser2 { currentUser ->
             logChatHeaderTextView.text = chatLogHeader
@@ -125,7 +148,7 @@ class ChatLogFragment : Fragment() {
 
                 } else {
                     Log.d(TAG, "Attempt to send message.... to the group")
-                    performSendMessageToGroup(selectedList)
+                    performSendMessageToGroup(selectedList,currentUser)
                 }
 
             }
@@ -196,7 +219,8 @@ class ChatLogFragment : Fragment() {
                                 val chatMessage = dataSnapshot.getValue(ChatMessage::class.java)
                                 if (chatMessage != null && chatMessage.messageId.equals(messageOrVote.messageId)) {
                                     Log.d(TAG, "chatMessage!!.messageId(changed): ${chatMessage!!.messageId}")
-                                    if (chatMessage.sendUserId.equals(currentUserUID)) {
+                                    if (chatMessage.sendUserId.equals(currentUser.uid)) {
+                                        Log.d(TAG,"change chatFromUser id is: (currentUser.uid: ${currentUser.uid},send User UID: ${chatMessage.sendUserId})")
                                         chatAdapter.add(
                                             ChatFromItem(
                                                 chatMessage.text,
@@ -205,6 +229,7 @@ class ChatLogFragment : Fragment() {
                                         )
                                     } else {
                                         Util.fetchUser(chatMessage.sendUserId) { chatToUser ->
+                                            Log.d(TAG,"change chatToUser id is: (currentUser.uid: ${currentUser.uid},send User UID: ${chatToUser.uid})")
                                             chatAdapter.add(
                                                 ChatToItem(
                                                     chatMessage.text,
@@ -218,19 +243,19 @@ class ChatLogFragment : Fragment() {
 
                             override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
                                 val chatMessage = dataSnapshot.getValue(ChatMessage::class.java)
-                                if (chatMessage != null && chatMessage.messageId == messageOrVote.messageId) {
-
-                                    if (chatMessage.sendUserId == currentUserUID) {
-                                        Log.d(TAG, "chatMessage!!.messageId(added): ${chatMessage!!.messageId}")
+                                if (chatMessage != null && chatMessage.messageId.equals(messageOrVote.messageId)) {
+                                    Log.d(TAG, "chatMessage!!.messageId(add): (currentUser.uid: ${currentUser.uid},send User UID: ${chatMessage.sendUserId})")
+                                    if (chatMessage.sendUserId.equals(currentUser.uid)) {
+                                        Log.d(TAG,"add chatFromUser id is: (currentUser.uid: ${currentUser.uid},send User UID: ${chatMessage.sendUserId})")
                                         chatAdapter.add(
                                             ChatFromItem(
                                                 chatMessage.text,
                                                 currentUser
                                             )
                                         )
-//                                        Log.d(TAG, "chatMessage!!.messageId(added): ${chatMessage!!.messageId}")
                                     } else {
                                         Util.fetchUser(chatMessage.sendUserId) { chatToUser ->
+                                            Log.d(TAG,"add chatToUser id is : (currentUser.uid: ${currentUser.uid},send User UID:${chatToUser.uid})")
                                             chatAdapter.add(
                                                 ChatToItem(
                                                     chatMessage.text,
@@ -268,17 +293,23 @@ class ChatLogFragment : Fragment() {
                                 val voteMessage = dataSnapshot.getValue(VoteMessage::class.java)
                                 if (voteMessage != null && voteMessage.voteId.equals(messageOrVote.messageId)) {
                                     Log.d(TAG, "voteMessage!!.messageId(changed): ${voteMessage!!.voteId}")
-                                    if (voteMessage.sendUserId.equals(currentUserUID)) {
+                                    if (voteMessage.sendUserId.equals(currentUser.uid)) {
                                         chatAdapter.add(
                                             VoteFromItem(
-                                                currentUser
+                                                selectedList,
+                                                chatLog!!,
+                                                currentUser,
+                                                messageOrVote.messageId
                                             )
                                         )
                                     } else {
                                         Util.fetchUser(voteMessage.sendUserId) { chatToUser ->
                                             chatAdapter.add(
                                                 VoteToItem(
-                                                    chatToUser
+                                                    selectedList,
+                                                    chatLog!!,
+                                                    chatToUser,
+                                                    messageOrVote.messageId
                                                 )
                                             )
                                         }
@@ -290,17 +321,23 @@ class ChatLogFragment : Fragment() {
                                 val voteMessage = dataSnapshot.getValue(VoteMessage::class.java)
                                 if (voteMessage != null && voteMessage.voteId.equals(messageOrVote.messageId)) {
                                     Log.d(TAG, "voteMessage!!.messageId(changed): ${voteMessage!!.voteId}")
-                                    if (voteMessage.sendUserId.equals(currentUserUID)) {
+                                    if (voteMessage.sendUserId.equals(currentUser.uid)) {
                                         chatAdapter.add(
                                             VoteFromItem(
-                                                currentUser
+                                                selectedList,
+                                                chatLog!!,
+                                                currentUser,
+                                                messageOrVote.messageId
                                             )
                                         )
                                     } else {
                                         Util.fetchUser(voteMessage.sendUserId) { chatToUser ->
                                             chatAdapter.add(
                                                 VoteToItem(
-                                                    chatToUser
+                                                    selectedList,
+                                                    chatLog!!,
+                                                    chatToUser,
+                                                    messageOrVote.messageId
                                                 )
                                             )
                                         }
@@ -317,13 +354,13 @@ class ChatLogFragment : Fragment() {
     }
 
 
-    private fun performSendMessageToGroup(selectedList: ArrayList<User>) {
+    private fun performSendMessageToGroup(selectedList: ArrayList<User>,currentUser:User) {
         // how do we actually send a message to firebase...
         val text = edittext_chat_log.text.toString()
-        if (currentUserUID == "") return
+        if (currentUser.uid == "") return
         val timestamp = System.currentTimeMillis() / 1000
         val messageRef = FirebaseDatabase.getInstance().getReference("/${Util.MESSAGES}").push()
-        val chatMessage = ChatMessage(messageRef.key!!, currentUserUID, text, timestamp)
+        val chatMessage = ChatMessage(messageRef.key!!, currentUser.uid, text, timestamp)
         messageRef.setValue(chatMessage)
             .addOnSuccessListener {
                 Log.d(TAG, "Saved our chat message in the message table(group): ${messageRef.key}")
@@ -341,18 +378,18 @@ class ChatLogFragment : Fragment() {
                 recyclerview_chat_log.scrollToPosition(chatAdapter.itemCount - 1)
             }
 
-        addListOnGroupMember(chatLogId!!, text, selectedList, timestamp)
+        addListOnGroupMember(chatLogId!!, text, selectedList, timestamp,currentUser)
     }
 
 
     private fun performSendMessageToSingle(selectedList: ArrayList<User>,currentUser: User) {
         // how do we actually send a message to firebase...
         val text = edittext_chat_log.text.toString()
-        if (currentUserUID == "") return
+        if (currentUser.uid == "") return
         val timestamp = System.currentTimeMillis() / 1000
         val messageRef = FirebaseDatabase.getInstance().getReference("/${Util.MESSAGES}").push()
 
-        val chatMessage = ChatMessage(messageRef.key!!, currentUserUID, text, timestamp)
+        val chatMessage = ChatMessage(messageRef.key!!, currentUser.uid, text, timestamp)
         messageRef.setValue(chatMessage)
             .addOnSuccessListener {
                 Log.d(TAG, "Saved our chat message in the message table(single): ${messageRef.key}")
@@ -388,11 +425,12 @@ class ChatLogFragment : Fragment() {
             chatLogId!!,
             selectedList.get(0)!!.profileImageUrl,
             text,
-            timestamp
+            timestamp,
+            currentUser
         )
 
         iterator.forEach {
-            if (it.uid != currentUserUID) {
+            if (it.uid != currentUser.uid) {
                 memberRef = FirebaseDatabase.getInstance()
                     .getReference("/${Util.LISTS}/${it.uid}/${chatLogId}")
 
@@ -424,12 +462,13 @@ class ChatLogFragment : Fragment() {
         groupID: String,
         text: String,
         selectedList: ArrayList<User>,
-        timestamp: Long
+        timestamp: Long,
+        currentUser: User
     ) {
 
         var iterator = selectedList.iterator()
         var memberRef: DatabaseReference? = null
-        updateSenderMessageList(groupID, "", text, timestamp)
+        updateSenderMessageList(groupID, "", text, timestamp,currentUser)
 
         iterator.forEach {
             memberRef =
@@ -456,14 +495,13 @@ class ChatLogFragment : Fragment() {
         chatLogId: String,
         imageUri: String,
         text: String,
-        timestamp: Long
+        timestamp: Long,
+        currentUser: User
     ) {
 
         val memberRef = FirebaseDatabase.getInstance()
-            .getReference("/${Util.LISTS}/${currentUserUID}/${chatLogId}")
+            .getReference("/${Util.LISTS}/${currentUser.uid}/${chatLogId}")
 
-        chatLogId
-        chatLogHeader!!
         var latestMessage = ListLatestMessage(Util.ChatLog(chatLogId, chatLogHeader!!),
             selectedList, imageUri, text, true, timestamp)
 
@@ -518,6 +556,7 @@ class ChatLogFragment : Fragment() {
         try {
             //mCallback initialize
             mCallbackToChat = context as OnChatLogGoBackListener
+            mCallbackToVoteShow = context as ChatlogToVoteShowListener
         } catch (e: ClassCastException) {
         }
     }
