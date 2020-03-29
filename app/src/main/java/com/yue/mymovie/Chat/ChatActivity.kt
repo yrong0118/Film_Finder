@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
 import com.yue.mymovie.Chat.ChatModel.MovieByKW
+import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.Movie
 import com.yue.mymovie.R
@@ -101,7 +102,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         list: ArrayList<User>,
         chatLog: Util.ChatLog,
         voteID: String,
-        waitUserList: ArrayList<String>,
+        waitUserList: ArrayList<WaitVoteUser>,
         movieCandidateList: ArrayList<MovieByKW>
     ) {
         var  voteMovieActionFragment = VoteMovieActionFragment.newInstance(list,chatLog,voteID,waitUserList,movieCandidateList)

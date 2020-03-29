@@ -10,7 +10,6 @@ import android.widget.ImageView
 import com.google.firebase.database.*
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.yue.mymovie.Chat.ChatModel.MessageType
 import com.yue.mymovie.Chat.ChatModel.MovieByKW
 import com.yue.mymovie.Chat.VoteModel.VoteMovieGrade
 import com.yue.mymovie.LoginOrRegister.User
@@ -19,6 +18,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.yue.mymovie.Chat.ChatModel.VoteMovieItem
+import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.getMovieGrade
+import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.getRestUserList
 import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 
 import com.yue.mymovie.R
@@ -39,8 +40,9 @@ class ShowVoteMoveListFragment : Fragment() {
         var voteId:String? = ""
         var chatLog: Util.ChatLog? = null
         var voteMovieGradeList= arrayListOf<VoteMovieGrade>()
-        var waitUSerIdList= arrayListOf<String>()
-        var waitUserIdSet = setOf<String>()
+        var movieCandidateSet = mutableSetOf<String>()
+        var waitUserVoteList= arrayListOf<WaitVoteUser>()
+        var waitUserIdSet = mutableSetOf<String>()
         var voteMovieByKWList= arrayListOf<MovieByKW>()
         var start = 0
         var startUser = 0
@@ -63,7 +65,7 @@ class ShowVoteMoveListFragment : Fragment() {
     }
 
     interface GotoVoteActionListener {
-        fun gotoVoteAction(list: ArrayList<User>, chatlog: Util.ChatLog, voteId: String, waitUserList: ArrayList<String>, movieCandidateList: ArrayList<MovieByKW>)
+        fun gotoVoteAction(list: ArrayList<User>, chatlog: Util.ChatLog, voteId: String, waitUserList: ArrayList<WaitVoteUser>, movieCandidateList: ArrayList<MovieByKW>)
     }
 
     lateinit var goBackToChatLogBtn: ImageView
@@ -93,27 +95,40 @@ class ShowVoteMoveListFragment : Fragment() {
         }
 
         voteBtn.setOnClickListener{
-            Log.d(TAG,"waitUSerIdList.size: ${waitUSerIdList.size}")
-            mCallbackToVoteAction.gotoVoteAction(selectedList, chatLog!!, voteId!!, waitUSerIdList,voteMovieByKWList)
+            Log.d(TAG,"waitUSerIdList.size: $waitUserVoteList.size}")
+            mCallbackToVoteAction.gotoVoteAction(selectedList, chatLog!!, voteId!!,waitUserVoteList,voteMovieByKWList)
             voteMovieAdapter.clear()
         }
 
-
-        getMovieGrade{
+        movieCandidateSet.clear()
+        var movieList = arrayListOf<VoteMovieGrade>()
+        getMovieGrade(movieList, voteId!!){
             Log.d(TAG ,"voteMovieGradeList size is : ${it.size}")
+
             for (i in start until it.size){
-                Log.d(TAG ,"movie id is : ${it[i].MovieId}")
-                Log.d(TAG ,"movie grade is : ${it[i].grade}")
-                var currMovieByKW = MovieByKW("",it[i].MovieId,"",0)
-                getMovieData(currMovieByKW)
+                if (!movieCandidateSet.contains(it[i].MovieId)){
+                    movieCandidateSet.add(it[i].MovieId)
+                    voteMovieGradeList.add(it[i])
+                    Log.d(TAG ,"movie id is : ${it[i].MovieId}")
+                    Log.d(TAG ,"movie grade is : ${it[i].grade}")
+                    var currMovieByKW = MovieByKW("",it[i].MovieId,"",it[i].grade)
+                    getMovieData(currMovieByKW)
+                }
             }
             start ++
         }
 
-        getRestUserList{
+        waitUserIdSet.clear()
+        var userList = arrayListOf<WaitVoteUser>()
+        getRestUserList(userList, voteId!!){
             Log.d(TAG ,"waitUSerIdList size is : ${it.size}")
             for (i in startUser until it.size){
-                Log.d(TAG ,"movie id is : ${it[i]}")
+                if (!waitUserIdSet.contains(it[i].UserId)){
+                    waitUserIdSet.add(it[i].UserId)
+                    waitUserVoteList.add(it[i])
+                    Log.d(TAG ,"movie id is : ${it[i]}")
+                }
+
             }
             startUser ++
         }
@@ -154,66 +169,36 @@ class ShowVoteMoveListFragment : Fragment() {
 
     }
 
-    fun getMovieGrade( getList: (ArrayList<VoteMovieGrade>) -> Unit){
-        var ref = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${ShowVoteMoveListFragment.voteId}/movieVoteGrade")
-        ref.addChildEventListener(object: ChildEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
+//    fun getMovieGrade( getList: (ArrayList<VoteMovieGrade>) -> Unit){
+//        var ref = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${ShowVoteMoveListFragment.voteId}/movieVoteGrade")
+//        ref.addChildEventListener(object: ChildEventListener {
+//            override fun onCancelled(p0: DatabaseError) {
+//
+//            }
+//
+//            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+//
+//            }
+//
+//            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+//
+//            }
+//
+//            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+//                val voteMovieGrade = dataSnapshot.getValue(VoteMovieGrade::class.java)
+//                if(voteMovieGrade != null) {
+//                    voteMovieGradeList!!.add(voteMovieGrade)
+//                    getList(voteMovieGradeList!!)
+//                }
+//            }
+//
+//            override fun onChildRemoved(p0: DataSnapshot) {
+//
+//            }
+//        })
+//    }
 
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
 
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
-                val voteMovieGrade = dataSnapshot.getValue(VoteMovieGrade::class.java)
-                if(voteMovieGrade != null) {
-                    voteMovieGradeList!!.add(voteMovieGrade)
-                    getList(voteMovieGradeList!!)
-                }
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        })
-    }
-
-    fun getRestUserList( getList: (ArrayList<String>) -> Unit){
-        var ref = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${ShowVoteMoveListFragment.voteId}/waiteVoteUserId")
-        ref.addChildEventListener(object: ChildEventListener {
-            override fun onCancelled(p0: DatabaseError) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
-                val waitUser = dataSnapshot.getValue(WaitVoteUser::class.java)
-                if(waitUser != null && !waitUserIdSet.contains(waitUser.UserId)) {
-                    waitUSerIdList!!.add(waitUser.UserId)
-                    waitUserIdSet.plus(waitUser.UserId)
-                    getList(waitUSerIdList!!)
-
-                }
-
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-        })
-    }
 
 
 

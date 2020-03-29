@@ -7,6 +7,8 @@ import com.google.firebase.database.FirebaseDatabase
 import com.yue.mymovie.Chat.ChatLogFragment
 import com.yue.mymovie.Chat.VoteDialog
 import com.yue.mymovie.Chat.VoteModel.ChatVote
+import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.addMovieVoteList
+import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.addWaitVoteUserList
 import com.yue.mymovie.Chat.VoteModel.VoteMovieGrade
 import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.LoginOrRegister.User
@@ -36,20 +38,24 @@ class ChatLogVote {
                     Log.d(TAG, "voteMovieIdList: ${voteMovieIdList.size}")
                     Log.d(TAG, "Saved our chat message in the message table(group): ${voteRef.key}")
 
-                    for (i in  0 until waitVoteUserList.size){
-                        val voteWaitingListRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/waiteVoteUserId").push()
-                        voteWaitingListRef.setValue(waitVoteUserList[i]).addOnSuccessListener {
-                            Log.d(TAG, "Saved our WaitVoteUserID list in the vote table(group): ${voteWaitingListRef.key}")
-                        }
-                    }
+                    addWaitVoteUserList(voteRef.key!!,waitVoteUserList)
 
+                    addMovieVoteList(voteRef.key!!,voteMovieIdList)
 
-                    for (i in 0 until voteMovieIdList.size) {
-                        val voteMovieGradeRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/movieVoteGrade").push()
-                        voteMovieGradeRef.setValue(voteMovieIdList[i]).addOnSuccessListener {
-                            Log.d(TAG, "Saved our MovieId list in the vote table(group): ${voteMovieGradeRef.key}")
-                        }
-                    }
+//                    for (i in  0 until waitVoteUserList.size){
+//                        val voteWaitingListRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/waiteVoteUserId").push()
+//                        voteWaitingListRef.setValue(waitVoteUserList[i]).addOnSuccessListener {
+//                            Log.d(TAG, "Saved our WaitVoteUserID list in the vote table(group): ${voteWaitingListRef.key}")
+//                        }
+//                    }
+//
+//
+//                    for (i in 0 until voteMovieIdList.size) {
+//                        val voteMovieGradeRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/movieVoteGrade").push()
+//                        voteMovieGradeRef.setValue(voteMovieIdList[i]).addOnSuccessListener {
+//                            Log.d(TAG, "Saved our MovieId list in the vote table(group): ${voteMovieGradeRef.key}")
+//                        }
+//                    }
 
                 }
             val groupRef = FirebaseDatabase.getInstance()
@@ -159,6 +165,7 @@ class ChatLogVote {
 //
 //        }
 
+
         private fun getMovieVoteList(voteMovieList: ArrayList<MovieByKW>): ArrayList<VoteMovieGrade> {
             var list = arrayListOf<VoteMovieGrade>()
             val set = setOf<String>()
@@ -168,6 +175,14 @@ class ChatLogVote {
                     set.plus(voteMovieList.get(i).movieId)
                     list.add(VoteMovieGrade(current,0))
                 }
+            }
+            return list
+        }
+
+        private fun getWaitVoteUserList(selectedList: ArrayList<User>): ArrayList<WaitVoteUser> {
+            var list = arrayListOf<WaitVoteUser>()
+            for (i in 0 until selectedList.size) {
+                list.add(WaitVoteUser(selectedList[i].uid))
             }
             return list
         }
@@ -184,6 +199,7 @@ class ChatLogVote {
             return map
         }
 
+
         private fun getWaitVoteUserSet(selectedList: ArrayList<User>): Set<String> {
             var set = setOf<String>()
             for (i in 0 until selectedList.size) {
@@ -192,12 +208,6 @@ class ChatLogVote {
             return set
         }
 
-        private fun getWaitVoteUserList(selectedList: ArrayList<User>): ArrayList<WaitVoteUser> {
-            var list = arrayListOf<WaitVoteUser>()
-            for (i in 0 until selectedList.size) {
-                list.add(WaitVoteUser(selectedList[i].uid))
-            }
-            return list
-        }
+
     }
 }
