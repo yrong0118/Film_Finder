@@ -1,6 +1,8 @@
 package com.yue.mymovie
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -9,7 +11,6 @@ import com.google.firebase.database.ValueEventListener
 import com.yue.mymovie.Chat.ChatListFragment
 import com.yue.mymovie.LoginOrRegister.User
 import java.util.concurrent.CountDownLatch
-
 
 //the first way to is to use lambda, I cannot user return on the fun fetchCurrentUser2
 
@@ -115,7 +116,6 @@ class MyActivity : Activity() {
         b = findViewById(R.id.test1) as Button
         ctx = this
         b!!.setOnClickListener {
-            // TODO Auto-generated method stub
 
             displayAlert()
         }
@@ -176,3 +176,4 @@ class MyActivity : Activity() {
 }*/
 
 // https://api.yelp.com/v3/businesses/search?latitude=38.90218613387796&longitude=-77.0493872836232&radius=1500&categories=movietheaters&location=2224%20F%20St%20NW
+

@@ -11,6 +11,10 @@ import com.yue.mymovie.LoginOrRegister.User
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Future
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+
 
 class Util {
 
@@ -25,6 +29,7 @@ class Util {
         val LISTS = "Lists"
         val USERS = "users"
         val MOVIELIST = "movieVoteLists"
+        val timestamp = "timestamp"
         fun isStringEmpty(str:String):Boolean{
             return (str == null || str.length == 0)
         }
@@ -61,6 +66,9 @@ class Util {
 //        }
 
 
+        fun getTimestamp():Long{
+            return System.currentTimeMillis() / 1000
+        }
         fun gelog( getList: (ArrayList<VoteMovieGrade>) -> Unit){
             var ref = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${ShowVoteMoveListFragment.voteId}/movieVoteGrade")
             ref.addChildEventListener(object: ChildEventListener {
@@ -150,6 +158,23 @@ class Util {
             Log.d(ChatLogFragment.TAG,res)
             return res
 
+        }
+
+        @JvmStatic
+        fun getdate(tag:String,day:Int): String {
+            //2020-01-15
+            val sdf = SimpleDateFormat("yyyy-MM-dd")
+            //Getting current date
+            val cal = Calendar.getInstance()
+            //Displaying current date in the desired format
+//            System.out.println("Current Date: " + sdf.format(cal.getTime()))
+            //Number of Days to add/substract
+            cal.add(Calendar.DAY_OF_MONTH, day)
+            //Date after adding/subtract the days to the current date
+            val newDate = sdf.format(cal.getTime())
+            //Displaying the new Date after addition of Days to current date
+            Log.d(tag,"Date after Addition: $newDate")
+            return newDate
         }
 
 

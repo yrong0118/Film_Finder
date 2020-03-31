@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.yue.mymovie.Util.Companion.getdate
 import org.jetbrains.anko.doAsync
 import java.util.*
 import kotlin.collections.ArrayList
@@ -28,6 +29,7 @@ class MovieListFragment : Fragment() {
 
 
     companion object {
+        val TAG = "MovieListFragment"
         fun newInstance():MovieListFragment{
             val  fragment = MovieListFragment()
             val args = Bundle()
@@ -48,8 +50,11 @@ class MovieListFragment : Fragment() {
         var view = inflater.inflate(R.layout.fragment_movie_list, container, false)
 
         val contentType=getString(R.string.Content_Type)
-        val primaryReleaseDateGte = "2020-01-15"
-        val primaryReleaseDateLte = "2020-02-22"
+//        val primaryReleaseDateGte = "2020-01-15"
+//        val primaryReleaseDateLte = "2020-02-22"
+        val primaryReleaseDateGte = getdate(TAG,-15)
+        val primaryReleaseDateLte = getdate(TAG,15)
+
         val api_key = getString(R.string.glu_KEY)
         val authorization =  getString(R.string.authorization)
         val language = getString(R.string.language)

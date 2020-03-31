@@ -22,8 +22,8 @@ class ChatLogVote {
         val text = "[link] VOTE"
         val currentUserUID = Util.getCurrentUserUid()
         val TAG = "ChatLogVote"
-        var chatLogId = ChatLogFragment.chatLogId
-
+        val chatLogId = ChatLogFragment.chatLogId
+        val timestamp = Util.getTimestamp()
         fun performSendVoteToGroup(selectedList: ArrayList<User>,movieVoteItemSelectedList: ArrayList<MovieByKW>, currentUser: User,startVoteTimeStamp: Long,endVoteTimestamp: Long) {
             // how do we actually send a message to firebase...
             if (currentUserUID == "") return
@@ -60,7 +60,7 @@ class ChatLogVote {
                 }
             val groupRef = FirebaseDatabase.getInstance()
                 .getReference("/${Util.GROUPCHATS}/${chatLogId}/messages").push()
-            val messageType = MessageType(Util.VOTE, voteRef.key!!)
+            val messageType = MessageType(Util.VOTE, voteRef.key!!,timestamp)
             groupRef.setValue(messageType)
                 .addOnSuccessListener {
                     Log.d(

@@ -31,7 +31,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,newMessageFragment)
-            .addToBackStack(newMessageFragment.toString())
+//            .addToBackStack(newMessageFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
@@ -41,7 +41,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,chatLogFragment)
-            .addToBackStack(chatLogFragment.toString())
+//            .addToBackStack(chatLogFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
@@ -51,7 +51,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,chatLogFragment)
-            .addToBackStack(chatLogFragment.toString())
+//            .addToBackStack(chatLogFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
@@ -61,7 +61,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,chatListFragment)
-            .addToBackStack(chatListFragment.toString())
+//            .addToBackStack(chatListFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
@@ -72,7 +72,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,chatLogFragment)
-            .addToBackStack(chatLogFragment.toString())
+//            .addToBackStack(chatLogFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
@@ -82,7 +82,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,showVoteMoveListFragment)
-            .addToBackStack(showVoteMoveListFragment.toString())
+//            .addToBackStack(showVoteMoveListFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
@@ -92,7 +92,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,showVoteMoveListFragment)
-            .addToBackStack(showVoteMoveListFragment.toString())
+//            .addToBackStack(showVoteMoveListFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
@@ -109,7 +109,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,voteMovieActionFragment)
-            .addToBackStack(voteMovieActionFragment.toString())
+//            .addToBackStack(voteMovieActionFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }

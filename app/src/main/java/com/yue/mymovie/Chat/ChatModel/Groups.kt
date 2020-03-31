@@ -24,9 +24,10 @@ class TwoPersonChat (
 
 class MessageType (
     val messageType : String,
-    var messageId: String
+    val messageId: String,
+    val timestamp: Long
 ){
-    constructor():this("","")
+    constructor():this("","",-1)
 }
 
 

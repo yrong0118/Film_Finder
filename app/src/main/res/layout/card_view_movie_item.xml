@@ -6,7 +6,7 @@
     android:foreground="?android:attr/selectableItemBackgroundBorderless"
     android:id="@+id/cardView_movie"
     android:layout_width="110dp"
-    android:layout_height="190dp"
+    android:layout_height="195dp"
     android:layout_margin="1dp"
     cardview:cardCornerRadius ="4dp">
     <LinearLayout

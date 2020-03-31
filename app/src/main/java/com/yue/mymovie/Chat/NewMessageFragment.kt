@@ -200,7 +200,9 @@ class NewMessageFragment : Fragment() {
         val referenceCreater = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUserUid}/${twoPersonChatId}")
         Util.fetchUser(toUserId){toUser ->
             val listLatestMessage = ListLatestMessage(Util.ChatLog(twoPersonChatId, toUser.username),selectectedContact,
-                toUser.profileImageUrl,"",true,System.currentTimeMillis() / 1000)
+                toUser.profileImageUrl,"",true,
+                Util.getTimestamp()
+            )
             referenceCreater.setValue(listLatestMessage)
                 .addOnSuccessListener {
                     Log.d(TAG, "Saved the group on the creater list,twoPersonChatId: ${twoPersonChatId}")
@@ -243,7 +245,9 @@ class NewMessageFragment : Fragment() {
             }
         val referenceCreater = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUserUid}/${reference.key!!}")
 
-        val listLatestMessage = ListLatestMessage(Util.ChatLog(reference.key!!,chatLog.chatLogHeader),selctectedContact,"","",true,System.currentTimeMillis() / 1000)
+        val listLatestMessage = ListLatestMessage(Util.ChatLog(reference.key!!,chatLog.chatLogHeader),selctectedContact,"","",true,
+            Util.getTimestamp()
+        )
 
         referenceCreater.setValue(listLatestMessage)
             .addOnSuccessListener {

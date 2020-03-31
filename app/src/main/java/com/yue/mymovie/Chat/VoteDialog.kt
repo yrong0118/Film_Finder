@@ -78,7 +78,7 @@ class VoteDialog {
 //        set Button
 
             Util.fetchCurrentUser2 { currentUser ->
-                val timestamp = System.currentTimeMillis() / 1000
+                val timestamp = Util.getTimestamp()
 
 //                builder.setPositiveButton("CONFIRM",
 //                    DialogInterface.OnClickListener { dialogInterface, i ->
