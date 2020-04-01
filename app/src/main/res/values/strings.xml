@@ -4,6 +4,7 @@
     <string name="app_name">Film Finder</string>
     <string name="vote_view">Vote View</string>
     <string name="vote">Vote Action</string>
+    <string name="new_vote">Create New Movie Vote</string>
     <string name="film_chat">Film Chat</string>
     <string name="share_link">Share The Link</string>
     <string name="copy_the_link">Copy The Link</string>

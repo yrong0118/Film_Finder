@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".Chat.VoteModel.CreateNewVoteFragment">
+
+    <TextView
+        android:id="@+id/vote_view_text_new_vote"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center_horizontal"
+        android:maxLines="1"
+        android:paddingBottom="3dp"
+        android:paddingTop="6dp"
+        android:text="@string/new_vote"
+        android:textSize="15sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/ic_go_back_new_vote"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginLeft="@dimen/eight_dp"
+        app:layout_constraintBottom_toBottomOf="@id/vote_view_text_new_vote"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/vote_view_text_new_vote"
+        app:srcCompat="@drawable/ic_navigate_before" />
+
+    <View
+        android:id="@+id/delimiter_new_vote"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:background="@color/light_gray"
+        app:layout_constraintTop_toBottomOf="@id/vote_view_text_new_vote" />
+
+    <LinearLayout
+        android:id="@+id/LinearLayout_new_vote"
+        android:orientation="vertical"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/delimiter_new_vote">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/search_movie_name_new_vote"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:hint="Search Movie Name"
+                android:textSize="15sp"
+                android:text=""
+                android:layout_margin="10dp"
+                android:background="@drawable/rounded_edittext_register_login"
+                android:ems="10"
+                android:layout_gravity="center"
+                android:paddingLeft="16dp" />
+
+            <Button
+                android:id="@+id/add_movie_new_vote"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:textSize="15sp"
+                android:text="Search"
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/white"
+
+                android:background="@drawable/button_clickable" />
+        </LinearLayout>
+
+
+        <EditText
+            android:id="@+id/select_date_new_vote"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:hint="mm/dd/yyyy"
+            android:inputType="datetime"
+            android:text=""
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_edittext_register_login"
+            android:ems="10"
+            android:textSize="15sp"
+            android:layout_gravity="left"
+            android:paddingLeft="16dp" />
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_newVote"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/vote_button_new_vote"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="@string/confirm"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

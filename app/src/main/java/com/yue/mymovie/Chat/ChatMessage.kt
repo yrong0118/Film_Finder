@@ -4,6 +4,6 @@ data class ChatMessage(val messageId: String, val sendUserId: String, val text: 
     constructor() : this("", "","",-1)
 }
 
-data class VoteMessage(val voteId: String, val sendUserId: String, val startVoteTimestamp: Long) {
+data class VoteMessage(val voteId: String, val sendUserId: String, val startVoteTimeStamp: Long) {
     constructor() : this("", "",-1)
 }

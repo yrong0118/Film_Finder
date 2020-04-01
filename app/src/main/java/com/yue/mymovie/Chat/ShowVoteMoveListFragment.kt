@@ -165,7 +165,9 @@ class ShowVoteMoveListFragment : Fragment() {
         selectedMovie.movieImageUrl = filmImg
 
         voteMovieByKWList.add(selectedMovie)
+        Log.d(TAG,"selectedMovie name: ${selectedMovie}, size of movie list: ${voteMovieByKWList.size}")
         voteMovieAdapter.add(VoteMovieItem(selectedMovie,selectedList.size))
+        voteMovieAdapter.notifyDataSetChanged()
 
     }
 

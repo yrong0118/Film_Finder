@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
 import com.yue.mymovie.Chat.ChatModel.MovieByKW
+import com.yue.mymovie.Chat.VoteModel.CreateNewVoteFragment
+import com.yue.mymovie.Chat.VoteModel.ShowSearchMovieListFragment
 import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.Movie
@@ -15,8 +17,8 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
     ChatListFragment.OnChatLogSelectListener, ChatLogFragment.OnChatLogGoBackListener,
     ShowVoteMoveListFragment.OnMovieVoteShowGoBackListener ,ChatlogToVoteShowListener,
     VoteMovieActionFragment.OnMovieVoteActionGoBackListener,
-    ShowVoteMoveListFragment.GotoVoteActionListener {
-
+    ShowVoteMoveListFragment.GotoVoteActionListener, CreateNewVoteFragment.OnNewVoteGoBackListener,
+    CreateNewVoteFragment.OnNewVoteSearchMovieListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,8 +116,29 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
             .commit()
     }
 
+    override fun newVoteGoBack(selectedUserList:ArrayList<User>,chatLog:Util.ChatLog) {
+        var chatLogFragment = ChatLogFragment.newInstance(selectedUserList,chatLog)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,chatLogFragment)
+//            .addToBackStack(chatLogFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
 
-
+    override fun newVoteserchMovie(
+        selectedList: ArrayList<User>,
+        chatLog: Util.ChatLog,
+        searchKeyWord: String
+    ) {
+        var showSearchMovieListFragmentFragment = ShowSearchMovieListFragment.newInstance(selectedList,chatLog,searchKeyWord)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,showSearchMovieListFragmentFragment)
+//            .addToBackStack(showSearchMovieListFragmentFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
 
 
 }

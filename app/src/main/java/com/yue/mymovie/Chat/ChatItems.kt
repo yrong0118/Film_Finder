@@ -21,95 +21,180 @@ interface ChatlogToVoteShowListener {
 }
 
 
-class ChatFromItem(val text:String, val user: User): Item<GroupieViewHolder>() {
-    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.textview_from_row.text =text
+class ChatLogItem (val type: String,val text:String, val user: User,val selectedList: ArrayList<User>, val chatLog: Util.ChatLog, val voteId:String,val timestamp: Long): Item<GroupieViewHolder>(){
 
-        val uri = user.profileImageUrl
-        val targetImageView = viewHolder.itemView.imageview_chat_from_row
-        if (uri != ""){
-            Picasso.get().load(uri).into(targetImageView)
-        } else{
-            Picasso.get().load(R.drawable.unnamed).into(targetImageView)
-        }
-
+    constructor(_type:String, _text:String, _user:User, _timestamp: Long): this(_type,_text,_user, arrayListOf<User>(),Util.ChatLog(),"",_timestamp){
     }
 
+    constructor(_type:String, _user:User,_selectedList: ArrayList<User>, _chatLog: Util.ChatLog, _voteId:String,_timestamp: Long): this(_type,"",_user, _selectedList,_chatLog,_voteId,_timestamp){
+    }
 
     override fun getLayout(): Int {
-        return R.layout.chat_from_row
+        return when (type) {
+            Util.chatFromItem -> R.layout.chat_from_row
+            Util.chatToItem -> R.layout.chat_to_row
+            Util.voteFromItem -> R.layout.vote_from_row
+            Util.voteToItem -> R.layout.vote_to_row
+            else -> -1
+        }
     }
-}
 
-class ChatToItem(val text:String, val user: User): Item<GroupieViewHolder>() {
     override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.textview_to_row.text =text
-        // load our user image into the star
-        val uri = user.profileImageUrl
-        val targetImageView = viewHolder.itemView.imageview_chat_to_row
-        if (uri != ""){
-            Picasso.get().load(uri).into(targetImageView)
-        }else{
-            Picasso.get().load(R.drawable.unnamed).into(targetImageView)
+        when (type) {
+            Util.chatFromItem -> {
+                viewHolder.itemView.textview_from_row.text =text
+                val uri = user.profileImageUrl
+                val targetImageView = viewHolder.itemView.imageview_chat_from_row
+                if (uri != ""){
+                    Picasso.get().load(uri).into(targetImageView)
+                } else{
+                    Picasso.get().load(R.drawable.unnamed).into(targetImageView)
+                }
+            }
+            Util.chatToItem ->{
+                viewHolder.itemView.textview_to_row.text =text
+                // load our user image into the star
+                val uri = user.profileImageUrl
+                val targetImageView = viewHolder.itemView.imageview_chat_to_row
+                if (uri != ""){
+                    Picasso.get().load(uri).into(targetImageView)
+                }else{
+                    Picasso.get().load(R.drawable.unnamed).into(targetImageView)
+                }
+            }
+            Util.voteFromItem -> {
+                val uri = user.profileImageUrl
+                val targetImageView = viewHolder.itemView.imageview_from_row_vote
+                if (uri != ""){
+                    Picasso.get().load(uri).into(targetImageView)
+                }
+                val voteView:TextView = viewHolder.itemView.text_from_row_vote
+
+                voteView.setOnClickListener {
+                    Log.d("VoteItem","click VoteFromItem")
+                    ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+                    chatAdapter.clear()
+                }
+            }
+            Util.voteToItem ->{
+                val uri = user.profileImageUrl
+                val targetImageView = viewHolder.itemView.imageview_to_row_vote
+                if (uri != ""){
+                    Picasso.get().load(uri).into(targetImageView)
+                }
+
+                val voteView = viewHolder.itemView.text_to_row_vote
+                voteView.setOnClickListener {
+                    Log.d("VoteItem","click VoteToItem")
+                    ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+                    chatAdapter.clear()
+                }
+            }
         }
-
-
     }
 
-
-    override fun getLayout(): Int {
-        return R.layout.chat_to_row
-    }
 }
 
+open class ChatLogItemClass(
+    val type: String,
+    val text:String,
+    val user: User,
+    val selectedList: ArrayList<User>,
+    val chatLog: Util.ChatLog,
+    val voteId:String,
+    val timestamp: Long){
 
-class VoteFromItem(val selectedList: ArrayList<User>, val chatLog: Util.ChatLog, val user: User, val voteId:String): Item<GroupieViewHolder>() {
-    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        val uri = user.profileImageUrl
-        val targetImageView = viewHolder.itemView.imageview_from_row_vote
-        if (uri != ""){
-            Picasso.get().load(uri).into(targetImageView)
-        }
-        val voteView:TextView = viewHolder.itemView.text_from_row_vote
+    constructor():this ("","", User(),arrayListOf<User>(),Util.ChatLog(),"",-1)
+    constructor(_type:String, _text:String, _user:User,_timestamp: Long): this(_type,_text,_user, arrayListOf<User>(),Util.ChatLog(),"",_timestamp)
+    constructor(_type:String, _user:User,_selectedList: ArrayList<User>, _chatLog: Util.ChatLog, _voteId:String,_timestamp:Long): this(_type,"",_user, _selectedList,_chatLog,_voteId,_timestamp)
 
-        voteView.setOnClickListener {
-            Log.d("VoteItem","click VoteFromItem")
-            ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
-            chatAdapter.clear()
-        }
-
-    }
-
-
-    override fun getLayout(): Int {
-        return R.layout.vote_from_row
-    }
 }
+//class ChatFromItem(val text:String, val user: User): Item<GroupieViewHolder>() {
+//    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+//        viewHolder.itemView.textview_from_row.text =text
+//
+//        val uri = user.profileImageUrl
+//        val targetImageView = viewHolder.itemView.imageview_chat_from_row
+//        if (uri != ""){
+//            Picasso.get().load(uri).into(targetImageView)
+//        } else{
+//            Picasso.get().load(R.drawable.unnamed).into(targetImageView)
+//        }
+//
+//    }
+//    override fun getLayout(): Int {
+//        return R.layout.chat_from_row
+//    }
+//}
+
+//class ChatToItem(val text:String, val user: User): Item<GroupieViewHolder>() {
+//    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+//        viewHolder.itemView.textview_to_row.text =text
+//        // load our user image into the star
+//        val uri = user.profileImageUrl
+//        val targetImageView = viewHolder.itemView.imageview_chat_to_row
+//        if (uri != ""){
+//            Picasso.get().load(uri).into(targetImageView)
+//        }else{
+//            Picasso.get().load(R.drawable.unnamed).into(targetImageView)
+//        }
+//
+//    }
+//
+//    override fun getLayout(): Int {
+//        return R.layout.chat_to_row
+//    }
+//}
 
 
-class VoteToItem(val selectedList: ArrayList<User>, val chatLog: Util.ChatLog, val user: User, val voteId:String): Item<GroupieViewHolder>() {
-    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        // load our user image into the star
-        val uri = user.profileImageUrl
-        val targetImageView = viewHolder.itemView.imageview_to_row_vote
-        if (uri != ""){
-            Picasso.get().load(uri).into(targetImageView)
-        }
+//class VoteFromItem(val selectedList: ArrayList<User>, val chatLog: Util.ChatLog, val user: User, val voteId:String): Item<GroupieViewHolder>() {
+//    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+//        val uri = user.profileImageUrl
+//        val targetImageView = viewHolder.itemView.imageview_from_row_vote
+//        if (uri != ""){
+//            Picasso.get().load(uri).into(targetImageView)
+//        }
+//        val voteView:TextView = viewHolder.itemView.text_from_row_vote
+//
+//        voteView.setOnClickListener {
+//            Log.d("VoteItem","click VoteFromItem")
+//            ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+//            chatAdapter.clear()
+//        }
+//
+//    }
+//
+//
+//    override fun getLayout(): Int {
+//        return R.layout.vote_from_row
+//    }
+//}
+//
+//
+//class VoteToItem(val selectedList: ArrayList<User>, val chatLog: Util.ChatLog, val user: User, val voteId:String): Item<GroupieViewHolder>() {
+//    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+//        // load our user image into the star
+//        val uri = user.profileImageUrl
+//        val targetImageView = viewHolder.itemView.imageview_to_row_vote
+//        if (uri != ""){
+//            Picasso.get().load(uri).into(targetImageView)
+//        }
+//
+//        val voteView = viewHolder.itemView.text_to_row_vote
+//        voteView.setOnClickListener {
+//            Log.d("VoteItem","click VoteToItem")
+//            ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+//            chatAdapter.clear()
+//        }
+//
+//    }
+//
+//    override fun getLayout(): Int {
+//        return R.layout.vote_to_row
+//    }
+//}
 
-        val voteView = viewHolder.itemView.text_to_row_vote
-        voteView.setOnClickListener {
-            Log.d("VoteItem","click VoteToItem")
-            ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
-            chatAdapter.clear()
-        }
 
-    }
-
-
-    override fun getLayout(): Int {
-        return R.layout.vote_to_row
-    }
-}
 
 
 class LastMessageItem(val text : String, val  chatLog : Util.ChatLog, val selectedUserList : ArrayList<User>, val uri: String, val timestamp: Long, val readOrNot: Boolean ):Item<GroupieViewHolder>(){

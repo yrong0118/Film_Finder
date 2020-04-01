@@ -7,7 +7,7 @@ import com.yue.mymovie.Chat.ShowVoteMoveListFragment
 import com.yue.mymovie.Util
 import java.sql.Timestamp
 
-data class ChatVote(val voteId: String, val sendUserId: String, val startVoteTimeStamp: Long, val endVoteTimestamp: Long) {
+data class ChatVote(val voteId: String, val sendUserId: String, val startVoteTimeStamp: Long, val endVoteTimeStamp: Long) {
     constructor() : this("", "", -1,-1)
     //movieList(MovieId, VoteGread)
 }
