@@ -1,6 +1,5 @@
 package com.yue.mymovie.Chat
 
-
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.app.Dialog
@@ -63,19 +62,18 @@ class ChatLogFragment : Fragment() {
     lateinit var sendMessage: Button
     lateinit var mCallbackToChat: OnChatLogGoBackListener
     lateinit var moreChatLog: ImageView
-
+    lateinit var mCallbackNewVote : OnChatLogNewVote
 
 
 
     companion object {
-        var selectedVoteMovieList: ArrayList<MovieByKW> = arrayListOf()
         var selectedList = arrayListOf<User>()
         var chatLogId: String? = ""
         var chatLogHeader: String? = ""
         val TAG = "ChatLog Frafment"
         var chatLog: Util.ChatLog? = null
-        lateinit var mCallbackToVoteShow: ChatlogToVoteShowListener
 
+        lateinit var mCallbackToVoteShow: ChatlogToVoteShowListener
 
         fun newInstance(list: ArrayList<User>, chatlog: Util.ChatLog): ChatLogFragment {
             chatLog =chatlog
@@ -90,11 +88,15 @@ class ChatLogFragment : Fragment() {
 
         var chatAdapter = GroupAdapter<GroupieViewHolder>()
 
-        var adapterMovieSearchByKW = GroupAdapter<GroupieViewHolder>()
+//        var adapterMovieSearchByKW = GroupAdapter<GroupieViewHolder>()
     }
 
     interface OnChatLogGoBackListener {
         fun chatLogGoback()
+    }
+
+    interface OnChatLogNewVote {
+        fun chatLogNewVote(selectedList: ArrayList<User>,chatLog: Util.ChatLog)
     }
 
     override fun onResume() {
@@ -387,11 +389,7 @@ class ChatLogFragment : Fragment() {
 //                val intent = Intent(this.activity, MainActivity::class.java)
 //                startActivity(intent)
                 Log.d(TAG, "crete a new vote ")
-                selectedVoteMovieList.clear()
-                val api = getString(R.string.glu_KEY)
-                val page = getString(R.string.page1)
-                val imgFrontPath = getString(R.string.img_front_path)
-                VoteDialog.showVoteMovieDialog(this.context!!,selectedVoteMovieList,api, page, imgFrontPath)
+                mCallbackNewVote.chatLogNewVote(selectedList, chatLog!!)
 
             }
             R.id.menu_vote_history -> {
@@ -410,7 +408,8 @@ class ChatLogFragment : Fragment() {
         try {
             //mCallback initialize
             mCallbackToChat = context as OnChatLogGoBackListener
-            mCallbackToVoteShow = context as ChatlogToVoteShowListener
+            mCallbackNewVote = context as OnChatLogNewVote
+            mCallbackToVoteShow= context as ChatlogToVoteShowListener
         } catch (e: ClassCastException) {
         }
     }

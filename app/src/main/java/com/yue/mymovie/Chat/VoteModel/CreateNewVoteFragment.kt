@@ -32,9 +32,6 @@ class CreateNewVoteFragment : Fragment() {
         var selectedMovieList = arrayListOf<MovieByKW>()
         var chatLog = Util.ChatLog()
         var selectedVoteMovieList: ArrayList<MovieByKW> = arrayListOf()
-        var api: String = ""
-        var page: String = ""
-        var imgFrontPath: String = ""
 
         fun newInstance(_selectedList: ArrayList<User>,_chatLog: Util.ChatLog):CreateNewVoteFragment{
             selectedList = _selectedList
@@ -45,6 +42,16 @@ class CreateNewVoteFragment : Fragment() {
             return fragment
         }
 
+
+        fun newInstance(_selectedList: ArrayList<User>,_selectedMovieList: ArrayList<MovieByKW>,_chatLog: Util.ChatLog):CreateNewVoteFragment{
+            selectedList = _selectedList
+            chatLog = _chatLog
+            selectedMovieList = _selectedMovieList
+            var args = Bundle()
+            var fragment = CreateNewVoteFragment()
+            fragment.setArguments(args)
+            return fragment
+        }
     }
 
     lateinit var searchMovieKeyWordTextView : EditText
@@ -62,14 +69,38 @@ class CreateNewVoteFragment : Fragment() {
     }
 
     interface OnNewVoteSearchMovieListener {
-        fun newVoteserchMovie(selectedList: ArrayList<User>, chatLog: Util.ChatLog,searchKeyWord:String)
+        fun newVoteserchMovie(selectedList: ArrayList<User>, selectedMovieList: ArrayList<MovieByKW>, chatLog: Util.ChatLog,searchKeyWord:String)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(TAG,"FrangmentCyle: onCreate")
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        Log.d(TAG,"FrangmentCyle: onDetach")
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d(TAG,"FrangmentCyle: onDestroy")
+    }
+    override fun onStart() {
+        super.onStart()
+
+        Log.d(TAG,"FrangmentCyle: onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG,"FrangmentCyle: onResume")
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        Log.d(TAG,"FrangmentCyle: onCreateView")
         val view =  inflater.inflate(R.layout.fragment_create_new_vote, container, false)
 
         searchMovieKeyWordTextView = view.findViewById(R.id.search_movie_name_new_vote)
@@ -80,10 +111,10 @@ class CreateNewVoteFragment : Fragment() {
         goBack = view.findViewById(R.id.ic_go_back_new_vote)
         recyclerViewNewVote.adapter = adapternewVote
 
-        for (i in 0 until selectedVoteMovieList.size){
-            adapternewVote.add(VoteItem(selectedVoteMovieList.get(i)))
+        for (i in 0 until selectedMovieList.size){
+            adapternewVote.add(VoteItem(selectedMovieList.get(i)))
         }
-
+        adapternewVote.notifyDataSetChanged()
         Util.fetchCurrentUser2 { currentUser ->
             val timestamp = Util.getTimestamp()
             confirmBtn.setOnClickListener{
@@ -91,12 +122,11 @@ class CreateNewVoteFragment : Fragment() {
                     Toast.makeText(this.context,"Please Search the Movies to Vote First!",Toast.LENGTH_SHORT).show()
                 } else {
                     val waitinglist = selectedList
-                    performSendVoteToGroup(waitinglist, movieVoteItemSelectedList,currentUser,timestamp, timestamp)
+                    performSendVoteToGroup(waitinglist, selectedMovieList,currentUser,timestamp, timestamp)
                     Log.d(TAG, "Attempt to send message.... to the group")
-                    Log.d(TAG, "movieVoteItemSelectedList length : ${movieVoteItemSelectedList.size}")
+                    Log.d(TAG, "movieVoteItemSelectedList length : ${selectedMovieList.size}")
                     adapternewVote.clear()
                     selectedVoteMovieList.clear()
-
                     mCallbackToChat.newVoteGoBack(selectedList, chatLog)
                 }
             }
@@ -105,8 +135,7 @@ class CreateNewVoteFragment : Fragment() {
                 var searchMovieKeyWordText= searchMovieKeyWordTextView.text.toString().trim()
                 searchMovieKeyWordTextView.text.clear()
                 adapternewVote.clear()
-                mCallbackToSearchMovie.newVoteserchMovie(selectedList, chatLog,searchMovieKeyWordText)
-
+                mCallbackToSearchMovie.newVoteserchMovie(selectedList, selectedMovieList,chatLog,searchMovieKeyWordText)
             }
 
             goBack.setOnClickListener {
@@ -127,6 +156,7 @@ class CreateNewVoteFragment : Fragment() {
         super.onAttach(context)
         mCallbackToSearchMovie = context as OnNewVoteSearchMovieListener
         mCallbackToChat = context as OnNewVoteGoBackListener
+        Log.d(TAG,"FrangmentCyle: onAttach")
 
     }
 

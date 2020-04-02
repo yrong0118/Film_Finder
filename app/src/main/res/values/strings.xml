@@ -24,6 +24,8 @@
     <string name="add_contacts">Add contacts</string>
     <string name="cancle">Cancle</string>
     <string name="confirm">Confirm</string>
+    <string name="confirm_movie">Confirm The Movie</string>
+    <string name="confirm_vote">Confirm The Vote</string>
     <string name="search_movie_name">Search Movie Name You Want to Vote</string>
     <string name="choose_date">Choose the End Date of the Vote</string>
 </resources>

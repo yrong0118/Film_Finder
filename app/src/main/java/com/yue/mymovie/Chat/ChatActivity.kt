@@ -9,7 +9,6 @@ import com.yue.mymovie.Chat.VoteModel.CreateNewVoteFragment
 import com.yue.mymovie.Chat.VoteModel.ShowSearchMovieListFragment
 import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.LoginOrRegister.User
-import com.yue.mymovie.Movie
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
 
@@ -18,7 +17,9 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
     ShowVoteMoveListFragment.OnMovieVoteShowGoBackListener ,ChatlogToVoteShowListener,
     VoteMovieActionFragment.OnMovieVoteActionGoBackListener,
     ShowVoteMoveListFragment.GotoVoteActionListener, CreateNewVoteFragment.OnNewVoteGoBackListener,
-    CreateNewVoteFragment.OnNewVoteSearchMovieListener {
+    CreateNewVoteFragment.OnNewVoteSearchMovieListener, ChatLogFragment.OnChatLogNewVote,
+    ShowSearchMovieListFragment.OnShowSearchMovieGoBackListener,
+    ShowSearchMovieListFragment.OnShowSearchMovieConfirmListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -126,16 +127,48 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
             .commit()
     }
 
+
     override fun newVoteserchMovie(
         selectedList: ArrayList<User>,
+        selectedMovieList: ArrayList<MovieByKW>,
         chatLog: Util.ChatLog,
         searchKeyWord: String
     ) {
-        var showSearchMovieListFragmentFragment = ShowSearchMovieListFragment.newInstance(selectedList,chatLog,searchKeyWord)
+        var showSearchMovieListFragmentFragment = ShowSearchMovieListFragment.newInstance(selectedList,selectedMovieList,chatLog,searchKeyWord)
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.chat_container,showSearchMovieListFragmentFragment)
 //            .addToBackStack(showSearchMovieListFragmentFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun chatLogNewVote(selectedList: ArrayList<User>, chatLog: Util.ChatLog) {
+        var createNewVoteFragment = CreateNewVoteFragment.newInstance(selectedList,chatLog!!)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,createNewVoteFragment)
+//            .addToBackStack(showSearchMovieListFragmentFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun showSearchMovieGoBack(selectedList: ArrayList<User>, selectedMovieList: ArrayList<MovieByKW>,chatLog: Util.ChatLog) {
+        var createNewVoteFragment = CreateNewVoteFragment.newInstance(selectedList,selectedMovieList,chatLog!!)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,createNewVoteFragment)
+//            .addToBackStack(showSearchMovieListFragmentFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun showSearchMovieConfirm(selectedList: ArrayList<User>,chatLog: Util.ChatLog) {
+        var chatLogFragment = ChatLogFragment.newInstance(selectedList,chatLog)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,chatLogFragment)
+//            .addToBackStack(chatLogFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }

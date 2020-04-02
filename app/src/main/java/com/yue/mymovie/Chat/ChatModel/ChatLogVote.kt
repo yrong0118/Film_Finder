@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.yue.mymovie.Chat.ChatLogFragment
-import com.yue.mymovie.Chat.VoteDialog
 import com.yue.mymovie.Chat.VoteModel.ChatVote
 import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.addMovieVoteList
 import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.addWaitVoteUserList
@@ -24,10 +23,10 @@ class ChatLogVote {
         val TAG = "ChatLogVote"
         val chatLogId = ChatLogFragment.chatLogId
         val timestamp = Util.getTimestamp()
-        fun performSendVoteToGroup(selectedList: ArrayList<User>,movieVoteItemSelectedList: ArrayList<MovieByKW>, currentUser: User,startVoteTimeStamp: Long,endVoteTimestamp: Long) {
+        fun performSendVoteToGroup(selectedList: ArrayList<User>,selectedMovieList: ArrayList<MovieByKW>, currentUser: User,startVoteTimeStamp: Long,endVoteTimestamp: Long) {
             // how do we actually send a message to firebase...
             if (currentUserUID == "") return
-            val voteMovieIdList = getMovieVoteList(movieVoteItemSelectedList)
+            val voteMovieIdList = getMovieVoteList(selectedMovieList)
             var waitVoteUserList = getWaitVoteUserList(selectedList)
             val voteRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}").push()
             val chatVote = ChatVote(voteRef.key!!, currentUserUID,startVoteTimeStamp,endVoteTimestamp)
@@ -67,9 +66,9 @@ class ChatLogVote {
                         TAG,
                         "Saved messageType in the group table: ${voteRef.key}, $chatLogId"
                     )
-                    val inflater = LayoutInflater.from(VoteDialog.context)
-                    val chatLayout = inflater.inflate(R.layout.fragment_chat_log, null)
-                    chatLayout.recyclerview_chat_log.scrollToPosition(ChatLogFragment.chatAdapter.itemCount - 1)
+//                    val inflater = LayoutInflater.from(context)
+//                    val chatLayout = inflater.inflate(R.layout.fragment_chat_log, null)
+//                    chatLayout.recyclerview_chat_log.scrollToPosition(ChatLogFragment.chatAdapter.itemCount - 1)
                 }
 
             addListOnGroupMember(chatLogId!!, text, selectedList, startVoteTimeStamp,currentUser)

@@ -29,7 +29,7 @@ class VoteMovieActionFragment : Fragment() {
 
     companion object {
         val TAG = "VoteActionMoveList"
-        var selectedUserList = arrayListOf<User>()
+        var selectedList = arrayListOf<User>()
         var chatLogId: String? = ""
         var voteId:String? = ""
         var chatLog: Util.ChatLog? = null
@@ -42,13 +42,13 @@ class VoteMovieActionFragment : Fragment() {
         var voted = false
 
 
-        fun newInstance(list: ArrayList<User>, chatlog: Util.ChatLog, vId: String, waituserlist: ArrayList<WaitVoteUser>, moviecandidatelist: ArrayList<MovieByKW>): VoteMovieActionFragment {
-            chatLogId = chatlog!!.chatLogId
-            selectedUserList = list
-            voteId = vId
-            chatLog = chatlog
-            waitUserIdList = waituserlist
-            movieCandidateList = moviecandidatelist
+        fun newInstance(_selectedUserList: ArrayList<User>, _chatLog: Util.ChatLog, _voteId: String, _waitUserIdList: ArrayList<WaitVoteUser>, _movieCandidateList: ArrayList<MovieByKW>): VoteMovieActionFragment {
+            chatLogId = _chatLog!!.chatLogId
+            selectedList = _selectedUserList
+            voteId = _voteId
+            chatLog = _chatLog
+            waitUserIdList = _waitUserIdList
+            movieCandidateList = _movieCandidateList
             voted = false
             var args = Bundle()
             var fragment = VoteMovieActionFragment()
@@ -65,8 +65,9 @@ class VoteMovieActionFragment : Fragment() {
     var voteMovieAdapter = GroupAdapter<GroupieViewHolder>()
 
     interface OnMovieVoteActionGoBackListener {
-        fun movieVoteActionGoBack(list: ArrayList<User>, chatlog: Util.ChatLog, vId: String)
+        fun movieVoteActionGoBack(list: ArrayList<User>, chatlog: Util.ChatLog, voteId: String)
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,8 +85,9 @@ class VoteMovieActionFragment : Fragment() {
 
         goBackToShowVoteBtn.setOnClickListener {
             movieCandidateList.clear()
+            movieCandidateSet.clear()
             voteMovieAdapter.clear()
-            mCallbackToShowVote.movieVoteActionGoBack(selectedUserList, chatLog!!, voteId!!)
+            mCallbackToShowVote.movieVoteActionGoBack(selectedList, chatLog!!, voteId!!)
 
         }
 
@@ -95,7 +97,7 @@ class VoteMovieActionFragment : Fragment() {
 
             confirmBtn.setOnClickListener{
 
-                Log.d(TAG,"selectedMovieSet:${selectedMovieSet}")
+                Log.d(TAG,"selectedMovieSet.size :${selectedMovieSet.size}")
 
                 //delete waiteVoteUserId
 
@@ -110,11 +112,10 @@ class VoteMovieActionFragment : Fragment() {
 
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-                            for(waitUser in dataSnapshot.children){
-                                waitUser.ref.removeValue()
-                            }
+                        for(waitUser in dataSnapshot.children){
+                            waitUser.ref.removeValue()
+                        }
                         Log.d(TAG,"Update waiting user List Successfully")
-
                     }
                 })
 
@@ -131,19 +132,18 @@ class VoteMovieActionFragment : Fragment() {
 
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
 
-                            for(voteVote in dataSnapshot.children){
-                                voteVote.ref.removeValue()
-                            }
-                            Log.d(TAG,"Update waiting movie grade List Successfully")
-
-
+                        for(voteVote in dataSnapshot.children){
+                            voteVote.ref.removeValue()
+                        }
+                        Log.d(TAG,"Update waiting movie grade List Successfully")
                     }
                 })
 
+
                 var waitVoteUserList = getWaitVoteUserListById(waitUserIdList,currentUser)
-
-
                 Log.d(TAG,"Update wait user List.size: ${waitVoteUserList.size}")
+
+
                 Firebase.addWaitVoteUserList(voteId!!, waitVoteUserList)
 
                 movieCandidateSet.clear()
@@ -183,6 +183,9 @@ class VoteMovieActionFragment : Fragment() {
                     }
 
                 }
+                voteMovieAdapter.clear()
+
+                mCallbackToShowVote.movieVoteActionGoBack(selectedList, chatLog!!,voteId!!)
 
             }
 
@@ -207,7 +210,6 @@ class VoteMovieActionFragment : Fragment() {
 
         return list
     }
-
     fun showImgListByIdView(selectedMovieChoseList: ArrayList<MovieByKW>, recyclerMovieByKWView: RecyclerView){
         voteMovieAdapter.clear()
         for (i in 0 until selectedMovieChoseList.size) {
@@ -223,14 +225,14 @@ class VoteMovieActionFragment : Fragment() {
 
             var  iterator = selectedMovieList.iterator()
 
-            if (item.movie.selected){
-                item.movie.selected = false
+            if (item.movieByKWVote.selected){
+                item.movieByKWVote.selected = false
                 if(selectedMovieList!= null){
                     iterator.forEach {
-                        if ( it.movieId.equals(item.movie.movieId)){
+                        if ( it.movieId.equals(item.movieByKWVote.movieId)){
                             iterator.remove()
                             Log.d(TAG,"selectedMovieList length = ${selectedMovieList.size}")
-                            Log.d(TAG,"item movieName = ${item.movie.movieName} + ${item.movie.selected}")
+                            Log.d(TAG,"item movieName = ${item.movieByKWVote.movieName} + ${item.movieByKWVote.selected}")
                         }
                     }
 
@@ -238,10 +240,10 @@ class VoteMovieActionFragment : Fragment() {
                 voteMovieAdapter.notifyDataSetChanged()
 
             } else {
-                item.movie.selected = true
-                selectedMovieList.add(MovieByKW(item.movie.movieName,item.movie.movieId,item.movie.movieImageUrl,0))
+                item.movieByKWVote.selected = true
+                selectedMovieList.add(MovieByKW(item.movieByKWVote.movieName,item.movieByKWVote.movieId,item.movieByKWVote.movieImageUrl,0))
                 Log.d(TAG,"selectedContacts length = ${selectedMovieList.size}")
-                Log.d(TAG,"item movieName = ${item.movie.movieName} + ${item.movie.selected}")
+                Log.d(TAG,"item movieName = ${item.movieByKWVote.movieName} + ${item.movieByKWVote.selected}")
                 voteMovieAdapter.notifyDataSetChanged()
             }
 

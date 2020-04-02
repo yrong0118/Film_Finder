@@ -52,7 +52,7 @@
         android:id="@+id/vote_button_vote_movie_choose"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:text="@string/confirm"
+        android:text="@string/confirm_movie"
         android:background="@drawable/rounded_button"
         android:textColor="@android:color/white"
         android:textStyle="bold"
@@ -60,4 +60,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-</>
+</androidx.constraintlayout.widget.ConstraintLayout>

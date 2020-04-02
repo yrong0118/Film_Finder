@@ -1,6 +1,7 @@
 package com.yue.mymovie.Chat.VoteModel
 
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -10,15 +11,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.yue.mymovie.Chat.ChatLogFragment
-import com.yue.mymovie.Chat.ChatModel.MovieByKW
-import com.yue.mymovie.Chat.ChatModel.MovieByKWVote
-import com.yue.mymovie.Chat.ChatModel.MovieImgById
-import com.yue.mymovie.Chat.ChatModel.VoteItemSelected
-import com.yue.mymovie.Chat.VoteDialog
+import com.yue.mymovie.Chat.ChatModel.*
 import com.yue.mymovie.LoginOrRegister.User
 
 import com.yue.mymovie.R
@@ -36,10 +34,11 @@ class ShowSearchMovieListFragment : Fragment() {
 
     companion object {
 
-        val TAG = "ShowSearchMovieListFragment"
+        val TAG = "ShowSearchMovieListFr"
         var selectedList = arrayListOf<User>()
         var movieVoteItemSelectedList :ArrayList<MovieByKW> = arrayListOf()
-        var selectedMovieList = arrayListOf<MovieByKW>()
+        val selectedMovieCandidateList = arrayListOf<MovieByKW>()
+        val selectedMovieList = arrayListOf<MovieByKW>()
         var chatLog = Util.ChatLog()
         var selectedVoteMovieList: ArrayList<MovieByKW> = arrayListOf()
         var api: String = ""
@@ -47,7 +46,7 @@ class ShowSearchMovieListFragment : Fragment() {
         var imgFrontPath: String = ""
         var searchMovieKeyWordText = ""
 
-        fun newInstance(_selectedList: ArrayList<User>,_chatLog: Util.ChatLog,_searchMovieKeyWordText:String): ShowSearchMovieListFragment{
+        fun newInstance(_selectedList: ArrayList<User>,selectedMovieList:ArrayList<MovieByKW>,_chatLog: Util.ChatLog,_searchMovieKeyWordText:String): ShowSearchMovieListFragment{
             selectedList = _selectedList
             chatLog = _chatLog
             searchMovieKeyWordText = _searchMovieKeyWordText
@@ -59,16 +58,20 @@ class ShowSearchMovieListFragment : Fragment() {
 
     }
 
-    interface OnNewVoteGoBackListener {
-        fun newVoteGoBack(selectedList: ArrayList<User>, chatLog: Util.ChatLog)
+
+    interface OnShowSearchMovieGoBackListener {
+        fun showSearchMovieGoBack(selectedList: ArrayList<User>, selectedMovieList: ArrayList<MovieByKW>, chatLog: Util.ChatLog)
     }
 
+    interface OnShowSearchMovieConfirmListener {
+        fun showSearchMovieConfirm(selectedList: ArrayList<User>,chatLog: Util.ChatLog)
+    }
 
-    lateinit var recyclerViewNewVote: RecyclerView
+    lateinit var recyclerMovieByKWView: RecyclerView
     lateinit var confirmBtn: Button
     lateinit var goBack: ImageView
-    lateinit var mCallbackToChat: OnNewVoteGoBackListener
-    lateinit var mCallbackToSearchMovie:OnNewVoteSearchMovieListener
+    lateinit var mCallbackToNewVote: OnShowSearchMovieGoBackListener
+    lateinit var mCallbackToChatlog:OnShowSearchMovieConfirmListener
     var adapterMovieSearchByKW = GroupAdapter<GroupieViewHolder>()
 
     override fun onCreateView(
@@ -77,53 +80,64 @@ class ShowSearchMovieListFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_show_search_movie_list, container, false)
-
-        recyclerViewNewVote = view.findViewById(R.id.recyclerview_vote_movie_choose)
+        recyclerMovieByKWView = view.findViewById(R.id.recyclerview_vote_movie_choose)
         confirmBtn = view.findViewById(R.id.vote_button_vote_movie_choose)
         goBack = view.findViewById(R.id.ic_go_back_vote_movie_choose)
-        recyclerViewNewVote.adapter = adapterMovieSearchByKW
+        api = getString(R.string.glu_KEY)
+        page = getString(R.string.page1)
+        imgFrontPath = getString(R.string.img_front_path)
+        recyclerMovieByKWView.adapter = adapterMovieSearchByKW
 
         confirmBtn.setOnClickListener {
-            if () {}
+            if (selectedMovieCandidateList.size == 0) {
+                Toast.makeText(this.context,"Please choose the Movies You Want to Choose First",Toast.LENGTH_SHORT).show()
+            }
             else {
+                for (i in 0 until selectedMovieCandidateList.size) {
+                    selectedMovieList.add(selectedMovieCandidateList[i])
+                }
+                selectedMovieCandidateList.clear()
                 adapterMovieSearchByKW.clear()
+                mCallbackToNewVote.showSearchMovieGoBack(selectedList, selectedMovieList,chatLog)
+                Log.d(TAG,"selectedMovie size when confirm= ${selectedMovieList.size}")
+//                mCallbackToChatlog.showSearchMovieConfirm(selectedList, chatLog)
+
             }
         }
 
         goBack.setOnClickListener {
+            selectedMovieCandidateList.clear()
             adapterMovieSearchByKW.clear()
+            mCallbackToNewVote.showSearchMovieGoBack(selectedList, selectedMovieList,chatLog)
         }
-
-        showSearchMovieListDialog(searchMovieKeyWordText)
+        getMovieListData()
         return view
     }
 
-    fun getMovieListData(movieSearchKeyWord : String,recyclerMovieByKWView: RecyclerView){
+    fun getMovieListData(){
         var movieSelectedVoteRequestApi = RetrofitClient.instance.create(
             MovieSelectedVoteRequestApi::class.java)
-        movieSelectedVoteRequestApi.getMovieListByKeyword(movieSearchKeyWord,
-            VoteDialog.page,
-            VoteDialog.api
-        )
+        val movieSearchKeyWord = searchMovieKeyWordText
+        movieSelectedVoteRequestApi.getMovieListByKeyword(movieSearchKeyWord, page, api)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .filter { baseResponse -> baseResponse != null }
             .subscribe(
-                { baseResponse -> showMovieListByKwView(baseResponse,recyclerMovieByKWView) },
+                { baseResponse -> showMovieListByKwView(baseResponse) },
                 { throwable ->
                     //*******************************
-                    if (VoteDialog.context == null) {
+                    if (this.context == null) {
                         throw IllegalStateException("Fragment " + this + " not attached to a context.");
                     }
                     //*******************************
-                    Toast.makeText(VoteDialog.context, "Keywords Movies Search API Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this.context, "Keywords Movies Search API Failed", Toast.LENGTH_SHORT).show()
                     throwable.printStackTrace()
                 }
             )
     }
 
 
-    fun showMovieListByKwView(movieSelectedResponse: MovieSelectedResponse, recyclerMovieByKWView: RecyclerView){
+    fun showMovieListByKwView(movieSelectedResponse: MovieSelectedResponse){
         var movieIdList = Vector<MovieByKW>()
         if (movieSelectedResponse != null && movieSelectedResponse.results.size > 0) {
             for (i in 0 until movieSelectedResponse.results.size){
@@ -134,76 +148,83 @@ class ShowSearchMovieListFragment : Fragment() {
                 var movieByKW = MovieByKW(movieName,movieId,movieImageUrl,0)
                 var movieByKWVote = MovieByKWVote(movieName,movieId,movieImageUrl,false)
                 movieIdList.add(movieByKW)
-                getMovieImgData(movieByKWVote,movieId,recyclerMovieByKWView)
+                getMovieImgData(movieByKWVote,movieId)
 
             }
         }
     }
 
-    fun getMovieImgData(movieByKWVote: MovieByKWVote, movieId : String, recyclerMovieByKWView: RecyclerView){
+    fun getMovieImgData(movieByKWVote: MovieByKWVote, movieId : String){
         var movieImgVoteRequestApi = RetrofitClient.instance.create(MovieImgVoteRequestApi::class.java)
-        movieImgVoteRequestApi.getMovieImgById(movieId, VoteDialog.api)
+        movieImgVoteRequestApi.getMovieImgById(movieId, api)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .filter { baseResponse -> baseResponse != null }
             .subscribe(
-                { baseResponse -> showImgListByIdView(movieByKWVote, baseResponse,recyclerMovieByKWView) },
+                { baseResponse -> showImgListByIdView(movieByKWVote, baseResponse) },
                 { throwable ->
                     //*******************************
-                    if (VoteDialog.context == null) {
+                    if (this.context == null) {
                         throw IllegalStateException("Fragment " + this + " not attached to a context.");
                     }
                     //*******************************
-                    Toast.makeText(VoteDialog.context, "Movies Image Search By Id API Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this.context, "Movies Image Search By Id API Failed", Toast.LENGTH_SHORT).show()
                     throwable.printStackTrace()
                 }
             )
     }
 
-    fun showImgListByIdView(movieByKW: MovieByKWVote, movieImgResponse: MovieImgResponse, recyclerMovieByKWView: RecyclerView){
+    fun showImgListByIdView(movieByKWVote: MovieByKWVote, movieImgResponse: MovieImgResponse){
         var movieImgList = Vector<MovieImgById>()
         if (movieImgResponse != null && movieImgResponse.results.size > 0) {
             for (i in 0 until movieImgResponse.results.size){
-                Log.d(ChatLogFragment.TAG,"result.size: $movieImgResponse.results.size")
-                var movieImageUrl = VoteDialog.imgFrontPath + movieImgResponse.results.get(i).movieImageUrl
+                Log.d(TAG,"result.size: $movieImgResponse.results.size")
+                var movieImageUrl = imgFrontPath + movieImgResponse.results.get(i).movieImageUrl
                 movieImgList.add(MovieImgById(movieImageUrl))
             }
-            movieByKW.movieImageUrl = movieImgList.get(0).movieImageUrl
+            movieByKWVote.movieImageUrl = movieImgList.get(0).movieImageUrl
         }
-        ChatLogFragment.adapterMovieSearchByKW.add(VoteItemSelected(movieByKW))
-        recyclerMovieByKWView.adapter = ChatLogFragment.adapterMovieSearchByKW
+        adapterMovieSearchByKW.add(VoteItemSelected(movieByKWVote))
+        recyclerMovieByKWView.adapter = adapterMovieSearchByKW
 
-        ChatLogFragment.adapterMovieSearchByKW.setOnItemClickListener { item, view ->
+        adapterMovieSearchByKW.setOnItemClickListener { item, view ->
             Log.d(ChatLogFragment.TAG,"click the movie in the vote")
 
             item as VoteItemSelected
 
-            var  iterator = VoteDialog.selectedMovieList.iterator()
+            var  iterator = selectedMovieCandidateList.iterator()
 
-            if (item.movie.selected){
-                item.movie.selected = false
-                if(VoteDialog.selectedMovieList != null){
+            if (item.movieByKWVote.selected){
+                item.movieByKWVote.selected = false
+                if(selectedMovieCandidateList.size != 0){
                     iterator.forEach {
-                        if ( it.movieId.equals(item.movie.movieId)){
+                        if ( it.movieId.equals(item.movieByKWVote.movieId)){
                             iterator.remove()
-                            Log.d(VoteDialog.TAG,"selectedContacts length = ${VoteDialog.selectedMovieList.size}")
-                            Log.d(VoteDialog.TAG,"item movieName = ${item.movie.movieName} + ${item.movie.selected}")
+                            Log.d(TAG,"selectedContacts length = ${selectedMovieCandidateList.size}")
+                            Log.d(TAG,"item movieName = ${item.movieByKWVote.movieName} + ${item.movieByKWVote.selected}")
                         }
                     }
 
                 }
-                ChatLogFragment.adapterMovieSearchByKW.notifyDataSetChanged()
+                adapterMovieSearchByKW.notifyDataSetChanged()
 
             } else {
-                item.movie.selected = true
-                VoteDialog.selectedMovieList.add(MovieByKW(item.movie.movieName,item.movie.movieId,item.movie.movieImageUrl,0))
-                Log.d(VoteDialog.TAG,"selectedContacts length = ${VoteDialog.selectedMovieList.size}")
-                Log.d(VoteDialog.TAG,"item movieName = ${item.movie.movieName} + ${item.movie.selected}")
-                ChatLogFragment.adapterMovieSearchByKW.notifyDataSetChanged()
+                item.movieByKWVote.selected = true
+                selectedMovieCandidateList.add(MovieByKW(item.movieByKWVote.movieName,item.movieByKWVote.movieId,item.movieByKWVote.movieImageUrl,0))
+                Log.d(TAG,"selectedContacts length = ${selectedMovieCandidateList.size}")
+                Log.d(TAG,"item movieName = ${item.movieByKWVote.movieName} + ${item.movieByKWVote.selected}")
+                adapterMovieSearchByKW.notifyDataSetChanged()
             }
 
         }
 
+
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        mCallbackToNewVote = context as OnShowSearchMovieGoBackListener
+        mCallbackToChatlog = context as OnShowSearchMovieConfirmListener
+
+    }
 }
