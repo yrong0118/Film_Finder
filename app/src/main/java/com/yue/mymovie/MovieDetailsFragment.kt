@@ -6,6 +6,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.annotations.SerializedName
 import com.squareup.picasso.Picasso
+import com.yue.mymovie.Chat.ChatActivity
+import com.yue.mymovie.Chat.ShowVoteMoveListFragment
 import com.yue.mymovie.retrofit.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -33,22 +36,33 @@ class MovieDetailsFragment : Fragment() {
     lateinit var star:ImageView
     lateinit var movieDescription: TextView
     lateinit var recyclerVdeioView:RecyclerView
-    lateinit var mapBtn: Button
+    lateinit var goBackBtn: Button
     lateinit var readMore: TextView
     lateinit var readLess: TextView
-
+    lateinit var mCallBackToMovieList: MovieDetailToList
+    lateinit var mCallBackToVoteShow:  MovieDetailToVoteShow
 
     companion object {
-        fun newInstance(selectedMovieId : String): MovieDetailsFragment {
+        val TAG = "MovieDetailsFragment"
+
+        fun newInstance(): MovieDetailsFragment {
             var args = Bundle()
 //            args.putSerializable(NEWS, news)
 //            getData(selectedMovieId)
-
             var fragment = MovieDetailsFragment()
             fragment.setArguments(args)
             return fragment
         }
 
+    }
+
+
+    interface MovieDetailToList{
+        fun movieDetailToList()
+    }
+
+    interface MovieDetailToVoteShow{
+        fun movieDetailToVoteShow()
     }
 
 //    override fun onAttach(context: Context?) {
@@ -70,13 +84,14 @@ class MovieDetailsFragment : Fragment() {
         val view:View = inflater.inflate(R.layout.fragment_movie_details, container, false)
         val bundle = arguments
         val movieId = bundle!!.getString("movie_id")
+        val from_path = bundle!!.getString(Util.fromPath)
 
         movieTitle = view.findViewById(R.id.movie_detail_title)
         movieBGImg = view.findViewById(R.id.movie_detail_background)
         movieImg = view.findViewById(R.id.movie_detail_img)
         movieRating = view.findViewById(R.id.movie_detail_rating)
         movieDescription = view.findViewById(R.id.movie_detail_description)
-        mapBtn = view.findViewById(R.id.movie_detail_map)
+        goBackBtn = view.findViewById(R.id.go_back_movie_detail)
         star = view.findViewById(R.id.star)
         star.setImageResource(R.drawable.ic_star)
         movieFav = view.findViewById(R.id.movie_liked)
@@ -87,8 +102,6 @@ class MovieDetailsFragment : Fragment() {
 
         recyclerVdeioView = view.findViewById(R.id.tailer_pad)
 //        recyclerVdeioView.setHasFixedSize(true)
-
-
 
         getData(movieId!!)
 
@@ -102,6 +115,21 @@ class MovieDetailsFragment : Fragment() {
 //        if (movieDescription.lineCount <= 3){
 //            readMore.visibility = View.INVISIBLE
 //        }
+
+        Log.d(TAG,"from path: ${from_path}")
+        goBackBtn.setOnClickListener {
+            when(from_path){
+                MovieListFragment.TAG ->{
+                    mCallBackToMovieList.movieDetailToList()
+                }
+                ShowVoteMoveListFragment.TAG -> {
+                    mCallBackToVoteShow.movieDetailToVoteShow()
+                }
+                else ->{
+                    Log.d(TAG,"Can not go back from the movie detail page")
+                }
+            }
+        }
 
         readMore.setOnClickListener{
             readMore.setVisibility(View.INVISIBLE)
@@ -215,9 +243,27 @@ class MovieDetailsFragment : Fragment() {
         if (video.size > 0){
             var movieTailerAdapter = MovieTailerAdapter(video)
 
-            recyclerVdeioView.setAdapter(movieTailerAdapter);
+            recyclerVdeioView.setAdapter(movieTailerAdapter)
         }
 
+    }
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        try {
+            //mCallback initialize
+            mCallBackToMovieList = context as MovieDetailToList
+
+        } catch (e: ClassCastException) {
+            Log.d(TAG,"error: ${e.message}")
+        }
+
+        try {
+            //mCallback initialize
+            mCallBackToVoteShow = context as MovieDetailToVoteShow
+
+        } catch (e: ClassCastException) {
+            Log.d(TAG,"error: ${e.message}")
+        }
     }
 
 }

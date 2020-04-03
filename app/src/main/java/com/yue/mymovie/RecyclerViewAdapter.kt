@@ -66,42 +66,4 @@ class RecyclerViewAdapter(val mContext: Context, val mData:List<Movie>,val mCall
             }
         }
     }
-
-//    companion object Factory{
-//        class MyViewHolde(itemView: View): RecyclerView.ViewHolder(itemView) {
-//            lateinit var movieTitle: TextView
-//            lateinit var movieImg: ImageView
-//            fun MyViewHolde(itemView:View){
-//
-//                movieTitle = itemView.findViewById(R.id.movie_title) as TextView
-//                movieImg = itemView.findViewById(R.id.movie_img) as ImageView
-//            }
-//        }
-//    }
-
-
-//    class MyViewHolde(itemView: View): RecyclerView.ViewHolder(itemView) {
-//        lateinit var movieTitle: TextView
-//        lateinit var movieImg: ImageView
-//        companion object Factory{
-//
-//            fun MyViewHolde(itemView:View){
-//                movieTitle = itemView.findViewById(R.id.movie_title) as TextView
-//                movieImg = itemView.findViewById(R.id.movie_img) as ImageView
-//            }
-//
-//        }
-//    }
-
-//    class MyViewHolde(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        lateinit var movieTitle: TextView
-//        lateinit var movieImg: ImageView
-//
-//        constructor() : this() {
-//
-//            movieTitle = itemView.findViewById(R.id.movie_title) as TextView
-//            movieImg = itemView.findViewById(R.id.movie_img) as ImageView
-//        }
-//
-//    }
 }

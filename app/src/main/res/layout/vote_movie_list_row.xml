@@ -29,6 +29,8 @@
         android:textStyle="bold"
         android:textSize="15sp"
         android:padding = "@dimen/four_dp"
+        android:maxWidth="200dp"
+        android:maxLines="2"
         app:layout_constraintBottom_toTopOf="@+id/movie_grade_vote_movie_list_row"
         app:layout_constraintStart_toEndOf="@+id/imageview_vote_movie_list_row"
         app:layout_constraintTop_toTopOf="@id/imageview_vote_movie_list_row"
@@ -64,6 +66,20 @@
         app:layout_constraintBottom_toBottomOf="@id/movie_grade_vote_movie_list_row"
         app:layout_constraintStart_toEndOf="@id/movie_grade_vote_movie_list_row"
         />
+
+    <Button
+        android:id="@+id/movie_detail_movie_list_row"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Detail"
+        android:textSize="13sp"
+        android:padding="@dimen/four_dp"
+        android:background="@drawable/rounded_button"
+        android:textColor="@android:color/white"
+        android:layout_marginRight="@dimen/eight_dp"
+        app:layout_constraintBottom_toBottomOf="@+id/movie_grade_vote_movie_list_row"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/movie_name_textview_vote_movie_list_row" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

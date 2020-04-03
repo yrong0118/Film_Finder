@@ -167,17 +167,19 @@
                 android:id="@+id/tailer_pad"
                 android:padding="5dp"
                 app:layout_constraintTop_toBottomOf="@id/delimiter"
-                app:layout_constraintBottom_toTopOf="@id/movie_detail_map">
+                app:layout_constraintBottom_toTopOf="@id/go_back_movie_detail">
 
             </androidx.recyclerview.widget.RecyclerView>
 
 
             <Button
-                android:id="@+id/movie_detail_map"
+                android:id="@+id/go_back_movie_detail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Find the Cinema Nearby"
+                android:text="Back"
                 android:padding="5dp"
+                android:background="@drawable/rounded_button"
+                android:textColor="@android:color/white"
                 app:layout_constraintTop_toBottomOf="@id/tailer_pad"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"

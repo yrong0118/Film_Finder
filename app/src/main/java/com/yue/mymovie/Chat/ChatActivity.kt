@@ -9,6 +9,8 @@ import com.yue.mymovie.Chat.VoteModel.CreateNewVoteFragment
 import com.yue.mymovie.Chat.VoteModel.ShowSearchMovieListFragment
 import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.LoginOrRegister.User
+import com.yue.mymovie.MainActivity
+import com.yue.mymovie.MovieDetailsFragment
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
 
@@ -19,7 +21,9 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
     ShowVoteMoveListFragment.GotoVoteActionListener, CreateNewVoteFragment.OnNewVoteGoBackListener,
     CreateNewVoteFragment.OnNewVoteSearchMovieListener, ChatLogFragment.OnChatLogNewVote,
     ShowSearchMovieListFragment.OnShowSearchMovieGoBackListener,
-    ShowSearchMovieListFragment.OnShowSearchMovieConfirmListener {
+    ShowSearchMovieListFragment.OnShowSearchMovieConfirmListener,
+    ShowVoteMoveListFragment.OnMovieVoteShowToDetailListener,
+    MovieDetailsFragment.MovieDetailToVoteShow {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -172,6 +176,35 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }
+
+    override fun movieVoteShowToDetail(list: ArrayList<User>, chatLog: Util.ChatLog,selectedMovie:MovieByKW) {
+        //        lateinit var movieDetailsFragment:MovieDetailsFragment
+
+        val bundle = Bundle()
+        bundle.putString("movie_id", selectedMovie.movieId)//这里的values就是我们要传的值
+        bundle.putString(Util.fromPath,ShowVoteMoveListFragment.TAG)
+        var movieDetailsFragment= MovieDetailsFragment.newInstance()
+        movieDetailsFragment.setArguments(bundle)
+
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,movieDetailsFragment)
+//            .addToBackStack(movieDetailsFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun movieDetailToVoteShow() {
+        var  showVoteMoveListFragment = ShowVoteMoveListFragment.newInstance(ShowVoteMoveListFragment.selectedList,ShowVoteMoveListFragment.chatLog!!,ShowVoteMoveListFragment.voteId!!)
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.chat_container,showVoteMoveListFragment)
+//            .addToBackStack(showVoteMoveListFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+
+    }
+
 
 
 }

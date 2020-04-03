@@ -34,7 +34,7 @@ import io.reactivex.schedulers.Schedulers
 class ShowVoteMoveListFragment : Fragment() {
 
     companion object {
-        val TAG = "ShowVoteMoveList"
+        val TAG = Util.showVoteMoveListFragment
         var api = ""
         var language = ""
         var imgFrontPath= ""
@@ -42,11 +42,13 @@ class ShowVoteMoveListFragment : Fragment() {
         var voteId:String? = ""
         var chatLog: Util.ChatLog? = null
         var selectedList = arrayListOf<User>()
-        fun newInstance(list: ArrayList<User>, chatlog: Util.ChatLog, vId: String): ShowVoteMoveListFragment {
-            Log.d(TAG,"new instance VoteId is ${vId}")
+        lateinit var mCallbacktoDetail: OnMovieVoteShowToDetailListener
+
+        fun newInstance(list: ArrayList<User>, chatlog: Util.ChatLog, _voteId: String): ShowVoteMoveListFragment {
+            Log.d(TAG,"new instance VoteId is ${_voteId}")
             chatLogId = chatlog!!.chatLogId
             selectedList = list
-            voteId = vId
+            voteId = _voteId
             chatLog = chatlog
             var args = Bundle()
             var fragment = ShowVoteMoveListFragment()
@@ -69,6 +71,11 @@ class ShowVoteMoveListFragment : Fragment() {
     interface GotoVoteActionListener {
         fun gotoVoteAction(list: ArrayList<User>, chatlog: Util.ChatLog, voteId: String, waitUserList: ArrayList<WaitVoteUser>, movieCandidateList: ArrayList<MovieByKW>)
     }
+
+    interface OnMovieVoteShowToDetailListener {
+        fun movieVoteShowToDetail(list: ArrayList<User>, chatLog: Util.ChatLog,movie:MovieByKW)
+    }
+
 
     lateinit var goBackToChatLogBtn: ImageView
     lateinit var mCallbackToChat: OnMovieVoteShowGoBackListener
@@ -181,6 +188,7 @@ class ShowVoteMoveListFragment : Fragment() {
             //mCallback initialize
             mCallbackToChat = context as OnMovieVoteShowGoBackListener
             mCallbackToVoteAction = context as GotoVoteActionListener
+            mCallbacktoDetail = context as OnMovieVoteShowToDetailListener
         } catch (e: ClassCastException) {
         }
     }

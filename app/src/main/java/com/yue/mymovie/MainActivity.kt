@@ -3,6 +3,7 @@ package com.yue.mymovie
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
@@ -12,14 +13,18 @@ import com.google.android.material.bottomnavigation.BottomNavigationMenuView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.yue.mymovie.Chat.ChatActivity
+import com.yue.mymovie.Chat.ShowVoteMoveListFragment
 import com.yue.mymovie.LoginOrRegister.LoginOrRegisterActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.px2sp
 
-class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListener {
+class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListener,
+    MovieDetailsFragment.MovieDetailToList {
 
     lateinit var movieListFragment:MovieListFragment
     lateinit var savedMoveFragment:SavedMoveFragment
     lateinit var bottomBar : BottomNavigationView
+
 
 //    lateinit var fragmentManager: FragmentManager
 //    lateinit var fragmentTransaction: FragmentTransaction
@@ -30,6 +35,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListen
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val path = intent.getStringExtra(Util.fromPath)
+        val selectedMovieId = intent.getStringExtra("movie_id")
+
         //verifyUserIsLoggedIn()
 
         movieListFragment = MovieListFragment.newInstance()
@@ -37,8 +45,12 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListen
 
         bottomBar = findViewById(R.id.bottomBar)
 
+
         var movieListFragment = MovieListFragment.newInstance()
         supportFragmentManager.beginTransaction().add(R.id.container, movieListFragment).commit()
+
+
+
 
 
         bottomBar.setOnNavigationItemSelectedListener { item->
@@ -81,20 +93,27 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListen
 
     override fun onItemSelected(selectedMovie: Movie) {
 //        lateinit var movieDetailsFragment:MovieDetailsFragment
-        var movieDetailsFragment=MovieDetailsFragment.newInstance(selectedMovie.id)
-//        var args=Bundle()
-//        args.putString("mvoie_id",selectedMovie.id)
-//        movieDetailsFragment.arguments = args
-
+        var movieDetailsFragment=MovieDetailsFragment.newInstance()
         val bundle = Bundle()
         bundle.putString("movie_id", selectedMovie.id)//这里的values就是我们要传的值
+        bundle.putString(Util.fromPath,MovieListFragment.TAG)
         movieDetailsFragment.setArguments(bundle)
 
 
         supportFragmentManager
             .beginTransaction()
             .replace(R.id.container,movieDetailsFragment)
-            .addToBackStack(movieDetailsFragment.toString())
+//            .addToBackStack(movieDetailsFragment.toString())
+            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+            .commit()
+    }
+
+    override fun movieDetailToList() {
+        var movieListFragment = MovieListFragment.newInstance()
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.container,movieListFragment)
+//            .addToBackStack(showSearchMovieListFragmentFragment.toString())
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit()
     }

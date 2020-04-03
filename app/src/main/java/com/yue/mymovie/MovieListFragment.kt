@@ -26,10 +26,8 @@ class MovieListFragment : Fragment() {
     lateinit var mCallback: RecyclerViewAdapter.OnItemSelectListener
 
 
-
-
     companion object {
-        val TAG = "MovieListFragment"
+        val TAG = Util.movieListFragment
 
         fun newInstance():MovieListFragment{
             val  fragment = MovieListFragment()

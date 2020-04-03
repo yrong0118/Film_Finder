@@ -34,6 +34,9 @@ class Util {
         val chatToItem = "ChatToItem"
         val voteToItem = "VoteToItem"
         val voteFromItem = "VoteFromItem"
+        val movieListFragment = "MovieListFragment"
+        val showVoteMoveListFragment = "ShowVoteMoveListF"
+        val fromPath = "from_path"
         fun isStringEmpty(str:String):Boolean{
             return (str == null || str.length == 0)
         }

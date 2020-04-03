@@ -1,9 +1,12 @@
 package com.yue.mymovie.Chat.ChatModel
 
+import android.util.Log
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
+import com.yue.mymovie.Chat.ShowVoteMoveListFragment
 import com.yue.mymovie.Movie
+import com.yue.mymovie.MovieDetailsFragment
 import com.yue.mymovie.R
 import kotlinx.android.synthetic.main.selected_movie_new_vote_row.view.*
 import kotlinx.android.synthetic.main.selected_movie_new_vote_row.view.imageview_new_vote
@@ -63,6 +66,10 @@ class VoteMovieItem (val movie: MovieByKW, val fullGrade:Int): Item<GroupieViewH
             Picasso.get().load(movie.movieImageUrl).into(targetImageView)
         } else {
             Picasso.get().load(R.drawable.no_images_available).into(targetImageView)
+        }
+        viewHolder.itemView.movie_detail_movie_list_row.setOnClickListener {
+            Log.d(ShowVoteMoveListFragment.TAG,"Detail.click id: ${movie.movieId},name:${movie.movieName}")
+            ShowVoteMoveListFragment.mCallbacktoDetail.movieVoteShowToDetail(ShowVoteMoveListFragment.selectedList,ShowVoteMoveListFragment.chatLog!!,movie)
         }
 
     }
