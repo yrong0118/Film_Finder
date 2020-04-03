@@ -14,7 +14,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            android:id="@+id/recycleview_movie"
+            android:id="@+id/recycleview_movielist"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 

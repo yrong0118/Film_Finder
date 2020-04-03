@@ -24,6 +24,7 @@ class Util {
         val MESSAGE = "Message"
         val VOTE = "vote"
         val GROUPCHATS= "GroupChats"
+        val GROUPCREATER= "groupCreater"
         val TWOPERSONCHATS= "TwoPersonChats"
         val LISTS = "Lists"
         val USERS = "users"
@@ -72,34 +73,35 @@ class Util {
         fun getTimestamp():Long{
             return System.currentTimeMillis() / 1000
         }
-        fun gelog( getList: (ArrayList<VoteMovieGrade>) -> Unit){
-            var ref = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${ShowVoteMoveListFragment.voteId}/movieVoteGrade")
-            ref.addChildEventListener(object: ChildEventListener {
-                override fun onCancelled(p0: DatabaseError) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
 
-                override fun onChildMoved(p0: DataSnapshot, p1: String?) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-
-                override fun onChildChanged(p0: DataSnapshot, p1: String?) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-
-                override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
-                    val voteMovieGrade = dataSnapshot.getValue(VoteMovieGrade::class.java)
-                    if(voteMovieGrade != null) {
-                        ShowVoteMoveListFragment.voteMovieGradeList!!.add(voteMovieGrade)
-                        getList(ShowVoteMoveListFragment.voteMovieGradeList!!)
-                    }
-                }
-
-                override fun onChildRemoved(p0: DataSnapshot) {
-                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                }
-            })
-        }
+//        fun gelog( getList: (ArrayList<VoteMovieGrade>) -> Unit){
+//            var ref = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${ShowVoteMoveListFragment.voteId}/movieVoteGrade")
+//            ref.addChildEventListener(object: ChildEventListener {
+//                override fun onCancelled(p0: DatabaseError) {
+//                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//                }
+//
+//                override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+//                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//                }
+//
+//                override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+//                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//                }
+//
+//                override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+//                    val voteMovieGrade = dataSnapshot.getValue(VoteMovieGrade::class.java)
+//                    if(voteMovieGrade != null) {
+//                        ShowVoteMoveListFragment.voteMovieGradeList!!.add(voteMovieGrade)
+//                        getList(ShowVoteMoveListFragment.voteMovieGradeList!!)
+//                    }
+//                }
+//
+//                override fun onChildRemoved(p0: DataSnapshot) {
+//                    TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//                }
+//            })
+//        }
 
         fun fetchCurrentUser2(onUserFectch:(User)->Unit){
 

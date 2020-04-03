@@ -5,7 +5,6 @@ import android.widget.TextView
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
-import com.yue.mymovie.Chat.ChatLogFragment.Companion.chatAdapter
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
@@ -73,7 +72,7 @@ class ChatLogItem (val type: String,val text:String, val user: User,val selected
                 voteView.setOnClickListener {
                     Log.d("VoteItem","click VoteFromItem")
                     ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
-                    chatAdapter.clear()
+//                    chatAdapter.clear()
                 }
             }
             Util.voteToItem ->{
@@ -87,7 +86,7 @@ class ChatLogItem (val type: String,val text:String, val user: User,val selected
                 voteView.setOnClickListener {
                     Log.d("VoteItem","click VoteToItem")
                     ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
-                    chatAdapter.clear()
+//                    chatAdapter.clear()
                 }
             }
         }

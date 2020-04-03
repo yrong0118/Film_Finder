@@ -30,6 +30,7 @@ class MovieListFragment : Fragment() {
 
     companion object {
         val TAG = "MovieListFragment"
+
         fun newInstance():MovieListFragment{
             val  fragment = MovieListFragment()
             val args = Bundle()
@@ -61,7 +62,7 @@ class MovieListFragment : Fragment() {
         val imaFrontPAth = getString(R.string.img_front_path)
         val n = getString(R.string.page)
 
-        mry = view.findViewById(R.id.recycleview_movie)
+        mry = view.findViewById(R.id.recycleview_movielist)
         mry.layoutManager = GridLayoutManager(this.context,3)
 
         doAsync{

@@ -28,7 +28,6 @@ class CreateNewVoteFragment : Fragment() {
 
         val TAG = "CreateNewVoteFragment"
         var selectedList = arrayListOf<User>()
-        var movieVoteItemSelectedList :ArrayList<MovieByKW> = arrayListOf()
         var selectedMovieList = arrayListOf<MovieByKW>()
         var chatLog = Util.ChatLog()
         var selectedVoteMovieList: ArrayList<MovieByKW> = arrayListOf()
@@ -127,6 +126,7 @@ class CreateNewVoteFragment : Fragment() {
                     Log.d(TAG, "movieVoteItemSelectedList length : ${selectedMovieList.size}")
                     adapternewVote.clear()
                     selectedVoteMovieList.clear()
+                    selectedMovieList.clear()
                     mCallbackToChat.newVoteGoBack(selectedList, chatLog)
                 }
             }
@@ -141,6 +141,7 @@ class CreateNewVoteFragment : Fragment() {
             goBack.setOnClickListener {
                 adapternewVote.clear()
                 selectedVoteMovieList.clear()
+                selectedMovieList.clear()
                 mCallbackToChat.newVoteGoBack(selectedList, chatLog)
 
             }

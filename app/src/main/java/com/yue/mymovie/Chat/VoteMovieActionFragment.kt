@@ -35,10 +35,7 @@ class VoteMovieActionFragment : Fragment() {
         var chatLog: Util.ChatLog? = null
         var waitUserIdList= arrayListOf<WaitVoteUser>()
         var movieCandidateList = arrayListOf<MovieByKW>()
-        var movieCandidateSet = mutableSetOf<String>()
-        var voteMovieGradeList= arrayListOf<VoteMovieGrade>()
-        var selectedMovieList = arrayListOf<MovieByKW>()
-        var selectedMovieSet = mutableSetOf<String>()
+
         var voted = false
 
 
@@ -49,6 +46,7 @@ class VoteMovieActionFragment : Fragment() {
             chatLog = _chatLog
             waitUserIdList = _waitUserIdList
             movieCandidateList = _movieCandidateList
+            Log.d(TAG,"new Instance: movieCandidate size: ${movieCandidateList.size}}")
             voted = false
             var args = Bundle()
             var fragment = VoteMovieActionFragment()
@@ -58,6 +56,11 @@ class VoteMovieActionFragment : Fragment() {
 
     }
 
+    var voteMovieGradeList= arrayListOf<VoteMovieGrade>()
+    var selectedMovieList = arrayListOf<MovieByKW>()
+    //selectedMovieList is use for count the movie that user choose
+    var movieCandidateSet = mutableSetOf<String>()
+    var selectedMovieSet = mutableSetOf<String>()
     lateinit var goBackToShowVoteBtn: ImageView
     lateinit var mCallbackToShowVote: OnMovieVoteActionGoBackListener
     lateinit var recyclerViewMovieVoteAction : RecyclerView
@@ -80,12 +83,15 @@ class VoteMovieActionFragment : Fragment() {
         confirmBtn = view.findViewById(R.id.vote_button_vote_action)
         recyclerViewMovieVoteAction.adapter = voteMovieAdapter
 
-        showImgListByIdView(movieCandidateList,recyclerViewMovieVoteAction)
 
+        //count the selection of the movies - selectedMovieList
+        showImgListByIdView()
 
         goBackToShowVoteBtn.setOnClickListener {
             movieCandidateList.clear()
             movieCandidateSet.clear()
+            selectedMovieSet.clear()
+            selectedMovieList.clear()
             voteMovieAdapter.clear()
             mCallbackToShowVote.movieVoteActionGoBack(selectedList, chatLog!!, voteId!!)
 
@@ -119,73 +125,64 @@ class VoteMovieActionFragment : Fragment() {
                     }
                 })
 
-                //delete movieVoteGrade
 
-                val opMVRef : DatabaseReference = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteId!!}/movieVoteGrade")
-
-                opMVRef.addListenerForSingleValueEvent(object:ValueEventListener{
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.d(TAG,"Update waiting movie grade List Failed:$error")
-
-                    }
-
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                        for(voteVote in dataSnapshot.children){
-                            voteVote.ref.removeValue()
-                        }
-                        Log.d(TAG,"Update waiting movie grade List Successfully")
-                    }
-                })
-
-
+                // remove the current vote user from the waiting vote list
                 var waitVoteUserList = getWaitVoteUserListById(waitUserIdList,currentUser)
                 Log.d(TAG,"Update wait user List.size: ${waitVoteUserList.size}")
 
 
                 Firebase.addWaitVoteUserList(voteId!!, waitVoteUserList)
 
-                movieCandidateSet.clear()
-                selectedMovieSet.clear()
+
                 var movieList = arrayListOf<VoteMovieGrade>()
 
                 for (i in 0 until selectedMovieList.size){
                     selectedMovieSet.add(selectedMovieList[i].movieId)
                 }
 
+                Log.d(TAG, "selectedMovieList size is : ${selectedMovieList.size}, movie id: ${selectedMovieList[0].movieId}")
                 Firebase.getMovieGrade (voteMovieGradeList, voteId!!){
                     Log.d(TAG, "voteMovieGradeList size is : ${it.size}")
 
-                    for (i in 0 until it.size) {
-//                        Log.d(ShowVoteMoveListFragment.TAG, "movie id is : ${it[i].MovieId}")
-//                        Log.d(ShowVoteMoveListFragment.TAG, "movie grade is : ${it[i].grade}")
-
-                        if(!movieCandidateSet.contains(it[i].MovieId)){
-                            movieCandidateSet.add(it[i].MovieId)
+                        if(!movieCandidateSet.contains(it[it.size - 1].MovieId)){
+                            movieCandidateSet.add(it[it.size - 1].MovieId)
                             Log.d(TAG,"movieCandidateSet.size: ${movieCandidateSet.size}")
-                            if (selectedMovieSet.contains(it[i].MovieId)){
-                                it[i].grade += 1
-                                Log.d(TAG,"movieid: ${it[i].MovieId}, new grade: ${it[i].grade}")
+                            if (selectedMovieSet.contains(it[it.size - 1].MovieId)){
+                                it[it.size - 1].grade += 1
+                                Log.d(TAG,"movieid: ${it[it.size - 1].MovieId}, new grade: ${it[it.size - 1].grade}")
                             } else {
-                                Log.d(TAG,"movieid: ${it[i].MovieId}, remain grade: ${it[i].grade}")
+                                Log.d(TAG,"movieid: ${it[it.size - 1].MovieId}, remain grade: ${it[it.size - 1].grade}")
                             }
-                            movieList.add(VoteMovieGrade(it[i].MovieId,it[i].grade))
+                            movieList.add(VoteMovieGrade(it[it.size - 1].MovieId,it[it.size - 1].grade))
 
                             Log.d(TAG,"movieCandidateList.size: ${movieCandidateList.size}")
 
-                            if (movieCandidateSet.size.equals(movieCandidateList.size)) {
+                            if (movieCandidateSet.size.equals(movieCandidateList.size) && (movieCandidateList.size!= 0)) {
+                                //这里还是有点问题，每次movieCandidateList每增加一次都会运行这里，
+                                // 从0-总共可选电影数量，只要不等于0 还是可以更新，可以初步解决问题， 但有待提升
                                 Log.d(TAG,"Update movie grade List.size: ${movieList.size}")
+                                //delete movieVoteGrade
+
+                                selectedMovieSet.clear()
+                                movieCandidateList.clear()
+                                movieCandidateSet.clear()
+                                voteMovieAdapter.clear()
+                                deleteMovieVoteGrade()
                                 Firebase.addMovieVoteList(voteId!!, movieList)
-                                break
+
+                                mCallbackToShowVote.movieVoteActionGoBack(selectedList, chatLog!!,voteId!!)
+
+
+
                             }
                         }
-                    }
+
 
                 }
-                voteMovieAdapter.clear()
 
-                mCallbackToShowVote.movieVoteActionGoBack(selectedList, chatLog!!,voteId!!)
+
+
+
 
             }
 
@@ -193,6 +190,8 @@ class VoteMovieActionFragment : Fragment() {
 
         return view
     }
+
+
 
 
     private fun getWaitVoteUserListById(waitUserIdList: ArrayList<WaitVoteUser>, currentUser: User): ArrayList<WaitVoteUser> {
@@ -210,13 +209,13 @@ class VoteMovieActionFragment : Fragment() {
 
         return list
     }
-    fun showImgListByIdView(selectedMovieChoseList: ArrayList<MovieByKW>, recyclerMovieByKWView: RecyclerView){
+    fun showImgListByIdView(){
         voteMovieAdapter.clear()
-        for (i in 0 until selectedMovieChoseList.size) {
-            var curr = selectedMovieChoseList[i]
+        for (i in 0 until movieCandidateList.size) {
+            var curr = movieCandidateList[i]
             voteMovieAdapter.add(VoteItemSelected(MovieByKWVote(curr.movieName,curr.movieId,curr.movieImageUrl,false)))
         }
-        recyclerMovieByKWView.adapter = voteMovieAdapter
+        recyclerViewMovieVoteAction.adapter = voteMovieAdapter
 
         voteMovieAdapter.setOnItemClickListener { item, view ->
             Log.d(TAG,"click the movie in the vote action")
@@ -249,6 +248,26 @@ class VoteMovieActionFragment : Fragment() {
 
         }
 
+    }
+
+    private fun deleteMovieVoteGrade() {
+        val opMVRef : DatabaseReference = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteId!!}/movieVoteGrade")
+
+        opMVRef.addListenerForSingleValueEvent(object:ValueEventListener{
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(TAG,"Update waiting movie grade List Failed:$error")
+
+            }
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                for(voteVote in dataSnapshot.children){
+                    voteVote.ref.removeValue()
+                }
+                Log.d(TAG,"Update waiting movie grade List Successfully")
+            }
+        })
     }
 
     override fun onAttach(context: Context) {

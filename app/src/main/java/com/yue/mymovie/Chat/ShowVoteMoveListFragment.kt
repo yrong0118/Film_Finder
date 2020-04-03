@@ -35,22 +35,15 @@ class ShowVoteMoveListFragment : Fragment() {
 
     companion object {
         val TAG = "ShowVoteMoveList"
-        var selectedList = arrayListOf<User>()
-        var chatLogId: String? = ""
-        var voteId:String? = ""
-        var chatLog: Util.ChatLog? = null
-        var voteMovieGradeList= arrayListOf<VoteMovieGrade>()
-        var movieCandidateSet = mutableSetOf<String>()
-        var waitUserVoteList= arrayListOf<WaitVoteUser>()
-        var waitUserIdSet = mutableSetOf<String>()
-        var voteMovieByKWList= arrayListOf<MovieByKW>()
         var api = ""
         var language = ""
         var imgFrontPath= ""
-        var start = 0
-        var startUser = 0
-
+        var chatLogId: String? = ""
+        var voteId:String? = ""
+        var chatLog: Util.ChatLog? = null
+        var selectedList = arrayListOf<User>()
         fun newInstance(list: ArrayList<User>, chatlog: Util.ChatLog, vId: String): ShowVoteMoveListFragment {
+            Log.d(TAG,"new instance VoteId is ${vId}")
             chatLogId = chatlog!!.chatLogId
             selectedList = list
             voteId = vId
@@ -62,6 +55,12 @@ class ShowVoteMoveListFragment : Fragment() {
         }
 
     }
+
+    var voteMovieGradeList= arrayListOf<VoteMovieGrade>()
+    var movieCandidateSet = mutableSetOf<String>()
+    var waitUserVoteList= arrayListOf<WaitVoteUser>()
+    var waitUserIdSet = mutableSetOf<String>()
+    var voteMovieByKWList= arrayListOf<MovieByKW>()
 
     interface OnMovieVoteShowGoBackListener {
         fun movieVoteShowGoBack(list: ArrayList<User>, chatLog: Util.ChatLog)
@@ -100,6 +99,7 @@ class ShowVoteMoveListFragment : Fragment() {
             voteMovieAdapter.clear()
             movieCandidateSet.clear()
             waitUserIdSet.clear()
+            waitUserVoteList.clear()
             mCallbackToChat.movieVoteShowGoBack(selectedList,chatLog!!)
         }
 
@@ -108,12 +108,13 @@ class ShowVoteMoveListFragment : Fragment() {
             voteMovieAdapter.clear()
             movieCandidateSet.clear()
             waitUserIdSet.clear()
+            Log.d(TAG,"new Instance: voteMovieByKWList size: ${voteMovieByKWList.size}}")
             mCallbackToVoteAction.gotoVoteAction(selectedList, chatLog!!, voteId!!,waitUserVoteList,voteMovieByKWList)
 
         }
-
         var movieList = arrayListOf<VoteMovieGrade>()
         getMovieGrade(movieList, voteId!!){
+
             Log.d(TAG ,"voteMovieGradeList size is : ${it.size}")
 
             if (!movieCandidateSet.contains(it[it.size-1].MovieId)){
@@ -122,6 +123,7 @@ class ShowVoteMoveListFragment : Fragment() {
                 Log.d(TAG ,"movie id is : ${it[it.size-1].MovieId}")
                 Log.d(TAG ,"movie grade is : ${it[it.size-1].grade}")
                 var currMovieByKW = MovieByKW("",it[it.size-1].MovieId,"",it[it.size-1].grade)
+                Log.d(TAG,"current movie id: ${currMovieByKW.movieId} before geting pic")
                 getMovieData(currMovieByKW)
             }
         }
@@ -168,7 +170,8 @@ class ShowVoteMoveListFragment : Fragment() {
         voteMovieByKWList.add(selectedMovie)
         Log.d(TAG,"selectedMovie name: ${selectedMovie}, size of movie list: ${voteMovieByKWList.size}")
         voteMovieAdapter.add(VoteMovieItem(selectedMovie,selectedList.size))
-        voteMovieAdapter.notifyDataSetChanged()
+        Log.d(TAG,"add adapter : curr movie name: ${selectedMovie.movieName}")
+//        voteMovieAdapter.notifyDataSetChanged()
 
     }
 

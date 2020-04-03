@@ -32,12 +32,14 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
 import com.xwray.groupie.Item
 import com.yue.mymovie.Chat.ChatModel.*
+import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.LoginOrRegister.LoginFragment
 import com.yue.mymovie.LoginOrRegister.User
 import com.yue.mymovie.Movie
 
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
+import com.yue.mymovie.Util.Companion.fetchCurrentUser2
 import com.yue.mymovie.Util.Companion.getLogChatHead
 import com.yue.mymovie.Util.Companion.getRef
 import com.yue.mymovie.Util.Companion.getTimestamp
@@ -63,8 +65,9 @@ class ChatLogFragment : Fragment() {
     lateinit var mCallbackToChat: OnChatLogGoBackListener
     lateinit var moreChatLog: ImageView
     lateinit var mCallbackNewVote : OnChatLogNewVote
-
-
+    lateinit var currentUser: User
+    var groupCreaterUID : String = "${Util.TWOPERSONCHATS}"
+    var chatAdapter = GroupAdapter<GroupieViewHolder>()
 
     companion object {
         var selectedList = arrayListOf<User>()
@@ -72,7 +75,6 @@ class ChatLogFragment : Fragment() {
         var chatLogHeader: String? = ""
         val TAG = "ChatLog Frafment"
         var chatLog: Util.ChatLog? = null
-
         lateinit var mCallbackToVoteShow: ChatlogToVoteShowListener
 
         fun newInstance(list: ArrayList<User>, chatlog: Util.ChatLog): ChatLogFragment {
@@ -85,8 +87,6 @@ class ChatLogFragment : Fragment() {
             fragment.setArguments(args)
             return fragment
         }
-
-        var chatAdapter = GroupAdapter<GroupieViewHolder>()
 
 //        var adapterMovieSearchByKW = GroupAdapter<GroupieViewHolder>()
     }
@@ -136,35 +136,68 @@ class ChatLogFragment : Fragment() {
             chatAdapter.clear()
             mCallbackToChat.chatLogGoback()
         }
-        chatAdapter.clear()
-
-        recyclerView.adapter = chatAdapter
 //        setDummyData()
-        Util.fetchCurrentUser2 { currentUser ->
-            logChatHeaderTextView.text = chatLogHeader
-            listenForMessages(chatLogId!!, currentUser)
 
-            sendMessage.setOnClickListener {
+        if (selectedList.size == 1) {
+            //single chat, no groupCreater
+            fetchCurrentUser2 { _currentUser->
+                currentUser = _currentUser
+                logChatHeaderTextView.text = chatLogHeader
+                listenForMessages(chatLogId!!, currentUser)
 
-                if (selectedList.size == 1) {
-                    Log.d(TAG, "Attempt to send message.... to the single")
-                    performSendMessageToSingle(selectedList,currentUser)
+                sendMessage.setOnClickListener {
 
-                } else {
-                    Log.d(TAG, "Attempt to send message.... to the group")
-                    performSendMessageToGroup(selectedList,currentUser)
+                    if (selectedList.size == 1) {
+                        Log.d(TAG, "Attempt to send message.... to the single")
+                        performSendMessageToSingle(selectedList,currentUser)
+
+                    } else {
+                        Log.d(TAG, "Attempt to send message.... to the group")
+                        performSendMessageToGroup(selectedList,currentUser)
+                    }
+
                 }
 
+                moreChatLog = view.findViewById(R.id.ic_group_infor_Logchat)
+
+                moreChatLog.setOnClickListener(View.OnClickListener { v -> showMenu(v) })
+
             }
+        } else {
+            //group chat
 
-            moreChatLog = view.findViewById(R.id.ic_group_infor_Logchat)
-            moreChatLog.setOnClickListener(View.OnClickListener { v -> showMenu(v) })
+            fetchCurrentUser2 { _currentUser -> getGroupCreater { _groupCreaterUID->
 
+                currentUser = _currentUser
+                logChatHeaderTextView.text = chatLogHeader
+                listenForMessages(chatLogId!!, currentUser)
 
+                sendMessage.setOnClickListener {
+
+                    if (selectedList.size == 1) {
+                        Log.d(TAG, "Attempt to send message.... to the single")
+                        performSendMessageToSingle(selectedList,currentUser)
+
+                    } else {
+                        Log.d(TAG, "Attempt to send message.... to the group")
+                        performSendMessageToGroup(selectedList,currentUser)
+                    }
+
+                }
+
+                groupCreaterUID = _groupCreaterUID
+
+                moreChatLog = view.findViewById(R.id.ic_group_infor_Logchat)
+
+                moreChatLog.setOnClickListener(View.OnClickListener { v -> showMenu(v) })
+
+            }
         }
 
 
+        }
         return view
+
     }
 
     private fun listenForMessages(chatLogId: String, currentUser: User) {
@@ -182,6 +215,7 @@ class ChatLogFragment : Fragment() {
 
 
         val lengthComparator = Comparator { c1: ChatLogItemClass, c2: ChatLogItemClass -> (c1.timestamp.toInt() - c2.timestamp.toInt())}
+
         getRef(TAG,ref,messageTypeList){
             val messageOrVote = messageTypeList[it.size - 1]
             Util.getChatLogItemClass(messageOrVote,chatLogItemClassList,currentUser, selectedList,
@@ -383,13 +417,22 @@ class ChatLogFragment : Fragment() {
         menuHelper.show()
     }
 
+
     fun onMenuItemClickChatLog(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_new_vote -> {
 //                val intent = Intent(this.activity, MainActivity::class.java)
 //                startActivity(intent)
-                Log.d(TAG, "crete a new vote ")
-                mCallbackNewVote.chatLogNewVote(selectedList, chatLog!!)
+                if (groupCreaterUID.equals(Util.TWOPERSONCHATS)){
+                    Toast.makeText(this.context,"You Cannot Greate Vote in This Chat!",Toast.LENGTH_SHORT).show()
+                } else if (currentUser.uid != groupCreaterUID){
+                    Toast.makeText(this.context,"Merely GroupGreater Can Create Vote!",Toast.LENGTH_SHORT).show()
+                } else {
+                    Log.d(TAG, "crete a new vote ")
+                    chatAdapter.clear()
+                    mCallbackNewVote.chatLogNewVote(selectedList, chatLog!!)
+                }
+
 
             }
             R.id.menu_vote_history -> {
@@ -403,6 +446,26 @@ class ChatLogFragment : Fragment() {
 
 
 
+    private fun getGroupCreater(getList:(String) -> Unit) {
+        val groupCreaterRef: DatabaseReference = FirebaseDatabase.getInstance()
+                .getReference("/${Util.GROUPCHATS}/${chatLogId}/${Util.GROUPCREATER}")
+        groupCreaterRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val groupCreater = dataSnapshot.getValue(String::class.java)
+                Log.d(TAG,"groupCreater UID : ${groupCreater}geId}")
+                getList(groupCreater!!)
+            }
+
+            override fun onCancelled(p0: DatabaseError) {}
+        })
+
+
+    }
+
+
+
+
+
     override fun onAttach(context: Context?) {
         super.onAttach(context)
         try {
@@ -413,112 +476,9 @@ class ChatLogFragment : Fragment() {
         } catch (e: ClassCastException) {
         }
     }
-//    fun getMovieImgData(movieId : String,recyclerMovieByKWView: RecyclerView){
-//        val api = getString(R.string.glu_KEY)
-//        val language = getString(R.string.language)
-//        var movieImgVoteRequestApi = RetrofitClient.instance.create(MovieImgVoteRequestApi::class.java)
-//        movieImgVoteRequestApi.getMovieImgById(movieId,api)
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .filter { baseResponse -> baseResponse != null }
-//            .subscribe(
-//                { baseResponse -> showImgListByIdView(baseResponse,recyclerMovieByKWView) },
-//                { throwable ->
-//                    //*******************************
-//                    if (context == null) {
-//                        throw IllegalStateException("Fragment " + this + " not attached to a context.");
-//                    }
-//                    //*******************************
-//                    Toast.makeText(context, "Movies Image Search By Id API Failed", Toast.LENGTH_SHORT).show()
-//                    throwable.printStackTrace()
-//                }
-//            )
-//    }
-//
-//    fun showImgListByIdView(movieImgResponse: MovieImgResponse, recyclerMovieByKWView: RecyclerView){
-//        var movieImgList = Vector<MovieImgById>()
-//        if (movieImgResponse != null && movieImgResponse.results.size > 0) {
-//            for (i in 0 until movieImgResponse.results.size){
-//                Log.d(TAG,"result.size: $movieImgResponse.results.size")
-//                var movieImageUrl = movieImgResponse.results.get(i).movieImageUrl
-//                movieImgList.add(MovieImgById(movieImageUrl))
-//            }
-//            var movieByKW = MovieByKW("XXXXXX","XXXXXX",movieImgList.get(0).movieImageUrl)
-//            adapterMovieSearchByKW.add(VoteItem(movieByKW))
-//
-//        }
-//
-//        recyclerMovieByKWView.adapter = adapterMovieSearchByKW
-//
-//    }
-
-
 }
 
 
-//    private fun getToId(selectedList: ArrayList<User>) : ArrayList<String>{
-//        var resultList = arrayListOf<String>()
-//        var iterator = selectedList.iterator()
-//        iterator.forEach(){
-//            resultList.add(it.uid)
-//        }
-//        return resultList
-//    }
-
-//    fun foundChatTotUser(sendUserUid: String) {
-//        val ref = FirebaseDatabase.getInstance().getReference("/${Util.USERS}/$sendUserUid")
-//        Log.d(TAG, "sendUserUid: ${sendUserUid}")
-//        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-//
-//            override fun onDataChange(p0: DataSnapshot) {
-//                val p0User = p0.getValue(User::class.java)
-//                Log.d(TAG, "p0User?.uid  ${p0User?.uid}    ${p0User?.profileImageUrl}")
-//                if (p0User?.uid .equals(sendUserUid)){
-//                    chatToUser = p0User
-//                    Log.d(TAG, " equals${chatToUser?.uid}    ${chatToUser?.profileImageUrl}.")
-//                }
-//
-//            }
-//
-//            override fun onCancelled(p0: DatabaseError) {
-//
-//            }
-//        })
-//        Log.d(TAG, "final  toChatUser ${chatToUser?.uid}")
-//    }
-
-    //    private fun setDummyData() {
-//        var adapter = GroupAdapter<GroupieViewHolder>()
-//
-//
-//        adapter.add(ChatFromItem("From message........"))
-//        adapter.add(ChatToItem("this message is toooooooooooo........"))
-//        adapter.add(ChatFromItem("From message........"))
-//        adapter.add(ChatToItem("this message is toooooooooooo........"))
-//    }
-//    private fun fetchChatTotUser1(sendUserUid: String) :User?{
-//        val ref = FirebaseDatabase.getInstance().getReference("/${Util.USERS}/$sendUserUid")
-//        Log.d(TAG, "sendUserUid: ${sendUserUid}")
-//        var iii:User? = null
-//        ref.addListenerForSingleValueEvent(object: ValueEventListener {
-//
-//            override fun onDataChange(p0: DataSnapshot) {
-//                val p0User=p0.getValue(User::class.java)
-//                Log.d(TAG, "p0User?.uid  ${p0User?.uid}    ${p0User?.profileImageUrl}")
-//                if (p0User?.uid .equals(sendUserUid)){
-//                    iii = p0User
-//                    Log.d(TAG, " equals${iii?.uid}    ${iii?.profileImageUrl}.")
-//                }
-//
-//            }
-//
-//            override fun onCancelled(p0: DatabaseError) {
-//
-//            }
-//        })
-//        Log.d(TAG, "final  toChatUser ${iii?.uid}")
-//        return iii
-//    }
 
 
 

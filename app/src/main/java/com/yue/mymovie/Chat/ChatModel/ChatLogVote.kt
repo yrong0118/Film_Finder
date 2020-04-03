@@ -41,21 +41,6 @@ class ChatLogVote {
 
                     addMovieVoteList(voteRef.key!!,voteMovieIdList)
 
-//                    for (i in  0 until waitVoteUserList.size){
-//                        val voteWaitingListRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/waiteVoteUserId").push()
-//                        voteWaitingListRef.setValue(waitVoteUserList[i]).addOnSuccessListener {
-//                            Log.d(TAG, "Saved our WaitVoteUserID list in the vote table(group): ${voteWaitingListRef.key}")
-//                        }
-//                    }
-//
-//
-//                    for (i in 0 until voteMovieIdList.size) {
-//                        val voteMovieGradeRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteRef.key}/movieVoteGrade").push()
-//                        voteMovieGradeRef.setValue(voteMovieIdList[i]).addOnSuccessListener {
-//                            Log.d(TAG, "Saved our MovieId list in the vote table(group): ${voteMovieGradeRef.key}")
-//                        }
-//                    }
-
                 }
             val groupRef = FirebaseDatabase.getInstance()
                 .getReference("/${Util.GROUPCHATS}/${chatLogId}/messages").push()

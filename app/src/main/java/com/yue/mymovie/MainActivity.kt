@@ -37,6 +37,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListen
 
         bottomBar = findViewById(R.id.bottomBar)
 
+        var movieListFragment = MovieListFragment.newInstance()
+        supportFragmentManager.beginTransaction().add(R.id.container, movieListFragment).commit()
+
 
         bottomBar.setOnNavigationItemSelectedListener { item->
             when(item.itemId){
