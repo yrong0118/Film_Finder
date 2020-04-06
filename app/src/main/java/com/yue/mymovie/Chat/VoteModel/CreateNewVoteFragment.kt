@@ -1,5 +1,6 @@
 package com.yue.mymovie.Chat.VoteModel
 
+import android.app.DatePickerDialog
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -21,6 +22,12 @@ import com.yue.mymovie.LoginOrRegister.User
 
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
+import java.sql.Date
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+
+
 
 class CreateNewVoteFragment : Fragment() {
 
@@ -61,6 +68,7 @@ class CreateNewVoteFragment : Fragment() {
     lateinit var goBack:ImageView
     lateinit var mCallbackToChat: OnNewVoteGoBackListener
     lateinit var mCallbackToSearchMovie:OnNewVoteSearchMovieListener
+    lateinit var dateBtn: Button
     var adapternewVote = GroupAdapter<GroupieViewHolder>()
 
     interface OnNewVoteGoBackListener {
@@ -108,7 +116,10 @@ class CreateNewVoteFragment : Fragment() {
         recyclerViewNewVote = view.findViewById(R.id.recyclerview_newVote)
         confirmBtn = view.findViewById(R.id.vote_button_new_vote)
         goBack = view.findViewById(R.id.ic_go_back_new_vote)
+        dateBtn = view.findViewById(R.id.choose_date_movie_new_vote)
         recyclerViewNewVote.adapter = adapternewVote
+        var startVote:Long = -1
+        var endVote:Long = -1
 
         for (i in 0 until selectedMovieList.size){
             adapternewVote.add(VoteItem(selectedMovieList.get(i)))
@@ -116,12 +127,15 @@ class CreateNewVoteFragment : Fragment() {
         adapternewVote.notifyDataSetChanged()
         Util.fetchCurrentUser2 { currentUser ->
             val timestamp = Util.getTimestamp()
+            startVote = timestamp
             confirmBtn.setOnClickListener{
                 if(selectedMovieList.size == 0) {
                     Toast.makeText(this.context,"Please Search the Movies to Vote First!",Toast.LENGTH_SHORT).show()
-                } else {
+                } else if (endVote.equals(-1L)){
+                    Toast.makeText(this.context,"Please Choose the End Date of the Vote!",Toast.LENGTH_SHORT).show()
+                }else{
                     val waitinglist = selectedList
-                    performSendVoteToGroup(waitinglist, selectedMovieList,currentUser,timestamp, timestamp)
+                    performSendVoteToGroup(waitinglist, selectedMovieList,currentUser,startVote, endVote)
                     Log.d(TAG, "Attempt to send message.... to the group")
                     Log.d(TAG, "movieVoteItemSelectedList length : ${selectedMovieList.size}")
                     adapternewVote.clear()
@@ -146,6 +160,33 @@ class CreateNewVoteFragment : Fragment() {
 
             }
 
+            val calendar = Calendar.getInstance()
+            val dateSetListener = DatePickerDialog.OnDateSetListener{ view:DatePicker,year:Int,month:Int,dayOfMonth:Int ->
+                calendar.set(Calendar.YEAR,year)
+                calendar.set(Calendar.MONTH,month)
+                calendar.set(Calendar.DAY_OF_MONTH,dayOfMonth)
+                val myFormat = "dd/MM/yyyy"
+                val sdf = SimpleDateFormat(myFormat, Locale.US)
+                val endVoteDate = sdf.format(calendar.time)
+                selectDateEdt.setText(endVoteDate)
+
+                try {
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy")
+                    val parsedDate = dateFormat.parse(endVoteDate)
+                    val timestamp = java.sql.Timestamp(parsedDate!!.time)
+
+                    endVote = timestamp.time/1000
+                    Log.d(TAG,"end vote stamptime: ${endVote}")
+                } catch (e: Exception) { //this generic but you can control another types of exception
+                    // look the origin of excption
+                }
+            }
+            dateBtn.setOnClickListener {
+                DatePickerDialog(this.context!!, dateSetListener,
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)).show()
+            }
 
         }
         return view

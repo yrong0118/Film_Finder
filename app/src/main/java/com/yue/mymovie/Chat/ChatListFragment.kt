@@ -57,9 +57,10 @@ class ChatListFragment : Fragment() {
             fragment.setArguments(args)
             return fragment
         }
-        var adapter = GroupAdapter<GroupieViewHolder>()
+
     }
 
+    var adapter = GroupAdapter<GroupieViewHolder>()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -83,6 +84,8 @@ class ChatListFragment : Fragment() {
             adapter.setOnItemClickListener { item, view ->
                 item as LastMessageItem
                 mCallbackChatLogSelect.chatLogSelect(item.selectedUserList,item.chatLog)
+                setHaveRead(item,currentUser)
+                adapter.notifyDataSetChanged()
             }
 
             adapter.clear()
@@ -90,6 +93,14 @@ class ChatListFragment : Fragment() {
 
 
         return view
+
+    }
+
+    private fun setHaveRead(item: LastMessageItem,currentUser:User) {
+        val haveReadRef = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUser.uid}/${item.chatLog.chatLogId}/readOrNot")
+        haveReadRef.setValue(true).addOnSuccessListener {
+            Log.d(TAG, "Updated the have read in the List table(group): ${haveReadRef.key}")
+        }
 
     }
 

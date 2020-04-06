@@ -41,10 +41,11 @@ class MovieDetailsFragment : Fragment() {
     lateinit var readLess: TextView
     lateinit var mCallBackToMovieList: MovieDetailToList
     lateinit var mCallBackToVoteShow:  MovieDetailToVoteShow
+    lateinit var mCallBackMovieReview: MovieReview
+    lateinit var clickReviewTV: TextView
 
     companion object {
         val TAG = "MovieDetailsFragment"
-
         fun newInstance(): MovieDetailsFragment {
             var args = Bundle()
 //            args.putSerializable(NEWS, news)
@@ -65,6 +66,10 @@ class MovieDetailsFragment : Fragment() {
         fun movieDetailToVoteShow()
     }
 
+    interface MovieReview{
+        fun movieReview(MovieId:String)
+    }
+
 //    override fun onAttach(context: Context?) {
 //        super.onAttach(context)
 //        fragmentManager = context as FragmentManager
@@ -83,7 +88,7 @@ class MovieDetailsFragment : Fragment() {
 
         val view:View = inflater.inflate(R.layout.fragment_movie_details, container, false)
         val bundle = arguments
-        val movieId = bundle!!.getString("movie_id")
+        val movieId = bundle!!.getString("movie_id")!!
         val from_path = bundle!!.getString(Util.fromPath)
 
         movieTitle = view.findViewById(R.id.movie_detail_title)
@@ -97,6 +102,7 @@ class MovieDetailsFragment : Fragment() {
         movieFav = view.findViewById(R.id.movie_liked)
         readMore = view.findViewById(R.id.read_more)
         readLess = view.findViewById(R.id.read_less)
+        clickReviewTV = view.findViewById(R.id.click_read_reviews)
 //
         // Inflate the layout for this fragment
 
@@ -141,6 +147,10 @@ class MovieDetailsFragment : Fragment() {
             readMore.setVisibility(View.VISIBLE)
             readLess.visibility = View.INVISIBLE
             movieDescription.maxLines = 2
+        }
+
+        clickReviewTV.setOnClickListener {
+            mCallBackMovieReview.movieReview(movieId)
         }
 
         return view
@@ -252,6 +262,7 @@ class MovieDetailsFragment : Fragment() {
         try {
             //mCallback initialize
             mCallBackToMovieList = context as MovieDetailToList
+            mCallBackMovieReview = context as MovieReview
 
         } catch (e: ClassCastException) {
             Log.d(TAG,"error: ${e.message}")
@@ -260,6 +271,7 @@ class MovieDetailsFragment : Fragment() {
         try {
             //mCallback initialize
             mCallBackToVoteShow = context as MovieDetailToVoteShow
+            mCallBackMovieReview = context as MovieReview
 
         } catch (e: ClassCastException) {
             Log.d(TAG,"error: ${e.message}")

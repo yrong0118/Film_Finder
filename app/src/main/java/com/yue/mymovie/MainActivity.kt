@@ -1,6 +1,7 @@
 package com.yue.mymovie
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -19,7 +20,16 @@ import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.px2sp
 
 class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemSelectListener,
-    MovieDetailsFragment.MovieDetailToList {
+    MovieDetailsFragment.MovieDetailToList, MovieDetailsFragment.MovieReview {
+    override fun movieReview(movieId: String) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
+        val content_url = Uri.parse("https://www.themoviedb.org/movie/${movieId}")
+        intent.data = content_url
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
 
     lateinit var movieListFragment:MovieListFragment
     lateinit var savedMoveFragment:SavedMoveFragment

@@ -1,6 +1,7 @@
 package com.yue.mymovie.Chat
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.FragmentTransaction
@@ -23,7 +24,7 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
     ShowSearchMovieListFragment.OnShowSearchMovieGoBackListener,
     ShowSearchMovieListFragment.OnShowSearchMovieConfirmListener,
     ShowVoteMoveListFragment.OnMovieVoteShowToDetailListener,
-    MovieDetailsFragment.MovieDetailToVoteShow {
+    MovieDetailsFragment.MovieDetailToVoteShow, MovieDetailsFragment.MovieReview {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -205,6 +206,15 @@ class ChatActivity: AppCompatActivity(), ChatListFragment.AddGroupChatListener,N
 
     }
 
+    override fun movieReview(movieId:String) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
+        val content_url = Uri.parse("https://www.themoviedb.org/movie/${movieId}")
+        intent.data = content_url
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivity(intent)
+        }
+    }
 
 
 }

@@ -98,7 +98,19 @@
                             android:textColor="#2d2d2d"/>
 
 
+
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/click_read_reviews"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Click to Read the Reviews!"
+                        android:textSize="15sp"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:layout_marginTop="15dp"
+                        android:textColor="@color/light_blue"/>
 
                 </LinearLayout>
 

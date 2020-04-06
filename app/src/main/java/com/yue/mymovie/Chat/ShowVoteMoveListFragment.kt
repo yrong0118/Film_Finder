@@ -178,7 +178,7 @@ class ShowVoteMoveListFragment : Fragment() {
         Log.d(TAG,"selectedMovie name: ${selectedMovie}, size of movie list: ${voteMovieByKWList.size}")
         voteMovieAdapter.add(VoteMovieItem(selectedMovie,selectedList.size))
         Log.d(TAG,"add adapter : curr movie name: ${selectedMovie.movieName}")
-//        voteMovieAdapter.notifyDataSetChanged()
+        voteMovieAdapter.notifyDataSetChanged()
 
     }
 

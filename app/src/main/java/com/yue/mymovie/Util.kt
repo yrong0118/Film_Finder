@@ -74,7 +74,8 @@ class Util {
 
 
         fun getTimestamp():Long{
-            return System.currentTimeMillis() / 1000
+//            return System.currentTimeMillis() / 1000
+            return java.util.Date().time / 1000
         }
 
 //        fun gelog( getList: (ArrayList<VoteMovieGrade>) -> Unit){
@@ -129,7 +130,7 @@ class Util {
         }
 
 
-        fun fetchUser(userUid: String,onUserFectch: (User) -> Unit){
+        fun fetchUser(userUid: String, onUserFectch: (User) -> Unit){
 //            var user = null as User
 //            val uid = FirebaseAuth.getInstance().uid
             val ref = FirebaseDatabase.getInstance().getReference("/users/$userUid")
@@ -186,6 +187,7 @@ class Util {
         }
 
         fun getChatLogItemClass (messageOrVote: MessageType, chatLogItemClassList:ArrayList<ChatLogItemClass>, currentUser:User,selectedList: ArrayList<User>,chatLog: ChatLog,onGetClass: (ArrayList<ChatLogItemClass>) -> Unit){
+//            chatLogItemClassList.clear()
             if (messageOrVote.messageType.equals(Util.MESSAGE)) {
                 Log.d(ChatLogFragment.TAG, " messageOrVote!!.messageId: ${messageOrVote!!.messageId}")
 
@@ -210,6 +212,7 @@ class Util {
                                 chatLogItemClassList.add(
                                     cur
                                 )
+                                Log.d("getChatLogItemClass","chat-change-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                 onGetClass(chatLogItemClassList)
 //                                Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.chatFromItem}, chatMessage text: ${chatMessage.text}, chatMessage send UID: ${currentUser.uid}")
 
@@ -224,7 +227,7 @@ class Util {
                                     chatLogItemClassList.add(
                                         cur
                                     )
-
+                                    Log.d("getChatLogItemClass","chat-change-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                     onGetClass(chatLogItemClassList)
 //                                    Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.chatToItem}, chatMessage text: ${chatMessage.text}, chatMessage send UID: ${chatToUser.uid}")
 
@@ -247,6 +250,7 @@ class Util {
                                 chatLogItemClassList.add(
                                     cur
                                 )
+                                Log.d("getChatLogItemClass","add-chat-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                 onGetClass(chatLogItemClassList)
 //                                Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.chatFromItem}, chatMessage text: ${chatMessage.text}, chatMessage send UID: ${currentUser.uid}")
 
@@ -261,6 +265,7 @@ class Util {
                                     chatLogItemClassList.add(
                                         cur
                                     )
+                                    Log.d("getChatLogItemClass","add-chat-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                     onGetClass(chatLogItemClassList)
 //                                    Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.chatToItem}, chatMessage text: ${chatMessage.text}, chatMessage send UID: ${chatToUser.uid}")
 
@@ -302,6 +307,7 @@ class Util {
                                     chatLogItemClassList.add(
                                         cur
                                     )
+                                    Log.d("getChatLogItemClass","change-vote-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                     onGetClass(chatLogItemClassList)
 
 //                                    Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.voteFromItem}, messageOrVote.messageId: ${messageOrVote.messageId}, chatMessage send UID: ${currentUser.uid}")
@@ -319,6 +325,7 @@ class Util {
                                     chatLogItemClassList.add(
                                         cur
                                     )
+                                    Log.d("getChatLogItemClass","change-vote-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                     onGetClass(chatLogItemClassList)
 //                                    Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.voteToItem}, messageOrVote.messageId: ${messageOrVote.messageId}, chatMessage send UID: ${sentUser.uid}")
 
@@ -344,6 +351,7 @@ class Util {
                                     chatLogItemClassList.add(
                                         cur
                                     )
+                                    Log.d("getChatLogItemClass","vote-add-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                     onGetClass(chatLogItemClassList)
 //                                    Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.voteFromItem}, messageOrVote.messageId: ${messageOrVote.messageId}, chatMessage send UID: ${currentUser.uid}")
 
@@ -360,6 +368,7 @@ class Util {
                                     chatLogItemClassList.add(
                                         cur
                                     )
+                                    Log.d("getChatLogItemClass","vote-add-chatLogItemClassList.length: ${chatLogItemClassList.size}")
                                     onGetClass(chatLogItemClassList)
 //                                    Log.d(ChatLogFragment.TAG,"chatMessage type: ${Util.voteToItem}, messageOrVote.messageId: ${messageOrVote.messageId}, chatMessage send UID: ${sentUser.uid}")
 
@@ -393,6 +402,8 @@ class Util {
                     }
                 })
         }
+
+
 
     }
 

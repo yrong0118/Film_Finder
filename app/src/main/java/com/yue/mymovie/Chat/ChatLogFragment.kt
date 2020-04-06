@@ -202,6 +202,7 @@ class ChatLogFragment : Fragment() {
 
     private fun listenForMessages(chatLogId: String, currentUser: User) {
         val messageTypeList = arrayListOf<MessageType>()
+
         val chatLogItemClassList =arrayListOf<ChatLogItemClass>()
         var ref: DatabaseReference
         if (selectedList.size == 1) {
@@ -222,6 +223,8 @@ class ChatLogFragment : Fragment() {
                 chatLog!!){
 //                Log.d(TAG,"${it.text}")
                 if (it.size == messageTypeList.size) {
+                    //因为每次都是从头添加，所以这块要把adapter清空 这样才不会从头增加一遍
+                    chatAdapter.clear()
                     chatLogItemClassList.sortWith(lengthComparator)
                     for(i in 0 until it.size) {
                         var cur = it[i]
@@ -255,6 +258,7 @@ class ChatLogFragment : Fragment() {
             .addOnSuccessListener {
                 Log.d(TAG, "Saved our chat message in the message table(group): ${messageRef.key}")
             }
+
         val groupRef = FirebaseDatabase.getInstance()
             .getReference("/${Util.GROUPCHATS}/${chatLogId}/messages").push()
         val messageType = MessageType(Util.MESSAGE, messageRef.key!!,timestamp)
@@ -276,17 +280,16 @@ class ChatLogFragment : Fragment() {
         // how do we actually send a message to firebase...
         val text = edittext_chat_log.text.toString()
         if (currentUser.uid == "") return
-        val timestamp = System.currentTimeMillis() / 1000
+        val timestamp = getTimestamp()
         val messageRef = FirebaseDatabase.getInstance().getReference("/${Util.MESSAGES}").push()
-
         val chatMessage = ChatMessage(messageRef.key!!, currentUser.uid, text, timestamp)
         messageRef.setValue(chatMessage)
             .addOnSuccessListener {
                 Log.d(TAG, "Saved our chat message in the message table(single): ${messageRef.key}")
             }
+
         val twoPersonRef = FirebaseDatabase.getInstance()
             .getReference("/${Util.TWOPERSONCHATS}/${chatLogId}/messages").push()
-
         val messageType = MessageType(Util.MESSAGE, messageRef.key!!,timestamp)
         twoPersonRef.setValue(messageType)
             .addOnSuccessListener {
@@ -308,44 +311,53 @@ class ChatLogFragment : Fragment() {
         timestamp: Long,
         currentUser: User
     ) {
-        var iterator = selectedList.iterator()
-        var memberRef: DatabaseReference? = null
 
-        updateSenderMessageList(
-            chatLogId!!,
-            selectedList.get(0)!!.profileImageUrl,
-            text,
-            timestamp,
-            currentUser
-        )
+        val memList = getSingleChatList(chatLogId,currentUser)
+        for (i in 0 until memList.size){
+            Log.d("memList",memList[i])
+        }
 
+        var memberRef: DatabaseReference
+
+        var iterator = memList.iterator()
         iterator.forEach {
-            if (it.uid != currentUser.uid) {
-                memberRef = FirebaseDatabase.getInstance()
-                    .getReference("/${Util.LISTS}/${it.uid}/${chatLogId}")
 
-                Util.fetchUser(it.uid) { singleUser ->
+            memberRef = FirebaseDatabase.getInstance()
+                .getReference("/${Util.LISTS}/${it}/${chatLogId}")
 
-                    val latestMessage = ListLatestMessage(
-                        Util.ChatLog(chatLogId,currentUser.username),
-                        selectedList,
-                        currentUser.profileImageUrl,
-                        text,
-                        false,
-                        timestamp
-                    )
-                    memberRef!!.setValue(latestMessage)
-                        .addOnSuccessListener {
-                            Log.d(
-                                TAG,
-                                "add the TwoPersonChatId to the list of member: ${memberRef!!.key}, ${chatLogId}"
-                            )
-                        }
-                }
-
+            var latestMessage = ListLatestMessage()
+            if (it.equals(currentUser.uid)) {
+                latestMessage = ListLatestMessage(
+                    Util.ChatLog(chatLogId,selectedList[0].username),
+                    selectedList,
+                    selectedList[0].profileImageUrl,
+                    text,
+                    true,
+                    timestamp
+                )
+            } else {
+                latestMessage = ListLatestMessage(
+                    Util.ChatLog(chatLogId,currentUser.username),
+                    selectedList,
+                    currentUser.profileImageUrl,
+                    text,
+                    false,
+                    timestamp
+                )
             }
 
+
+
+            memberRef!!.setValue(latestMessage)
+                .addOnSuccessListener {
+                    Log.d(
+                        TAG,
+                        "add the TwoPersonChatId to the list of member: ${memberRef!!.key}, ${chatLogId}"
+                    )
+                }
+
         }
+
     }
 
     private fun addListOnGroupMember(
@@ -357,54 +369,39 @@ class ChatLogFragment : Fragment() {
     ) {
 
         var iterator = selectedList.iterator()
-        var memberRef: DatabaseReference? = null
-        updateSenderMessageList(groupID, "", text, timestamp,currentUser)
-
+        var memberRef: DatabaseReference
+//        updateSenderMessageList(groupID, "", text, timestamp,currentUser)
+        val updateList = arrayListOf<String>()
         iterator.forEach {
-            memberRef =
-                FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${it.uid}/${groupID}")
-            val latestMessage = ListLatestMessage(
-                Util.ChatLog(groupID!!,chatLogHeader!!),
-                selectedList,
-                "",
-                text,
-                false,
-                timestamp
-            )
-            memberRef!!.setValue(latestMessage)
-                .addOnSuccessListener {
-                    Log.d(
-                        TAG,
-                        "add the groupid to the list of member: ${memberRef!!.key}, ${groupID}"
-                    )
-                }
+            updateList.add(it.uid)
         }
-    }
+        getGroupCreater{
 
-    private fun updateSenderMessageList(
-        chatLogId: String,
-        imageUri: String,
-        text: String,
-        timestamp: Long,
-        currentUser: User
-    ) {
-
-        val memberRef = FirebaseDatabase.getInstance()
-            .getReference("/${Util.LISTS}/${currentUser.uid}/${chatLogId}")
-
-        var latestMessage = ListLatestMessage(Util.ChatLog(chatLogId, chatLogHeader!!),
-            selectedList, imageUri, text, true, timestamp)
-
-
-        memberRef!!.setValue(latestMessage)
-            .addOnSuccessListener {
-                Log.d(
-                    TAG,
-                    "add the groupOrSingleId to the list of member: ${memberRef!!.key}, ${chatLogId}"
+            updateList.add(it)
+            val iter = updateList.iterator()
+            iter.forEach {
+                memberRef =
+                    FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${it}/${groupID}")
+                val latestMessage = ListLatestMessage(
+                    Util.ChatLog(groupID!!,chatLogHeader!!),
+                    selectedList,
+                    "",
+                    text,
+                    currentUser.uid == it,
+                    timestamp
                 )
+                memberRef!!.setValue(latestMessage)
+                    .addOnSuccessListener {
+                        Log.d(
+                            TAG,
+                            "add the groupid to the list of member: ${memberRef!!.key}, ${groupID}"
+                        )
+                    }
             }
+        }
 
     }
+
 
     @SuppressLint("RestrictedApi")
     private fun showMenu(view: View) {
@@ -438,6 +435,33 @@ class ChatLogFragment : Fragment() {
             R.id.menu_vote_history -> {
                 Log.d(TAG, "go to the vote history")
             }
+            R.id.menu_vote_drop_group -> {
+                Log.d(TAG, "drop the group")
+
+                val builder = AlertDialog.Builder(context!!)
+                val dialog = builder.create()
+                builder
+                    .setTitle("Drop the Group")
+                    .setMessage("Are you sure you want to drop this group? If yes, you wont't receive any message from this group!")
+                    .setPositiveButton(android.R.string.yes){ dialogInterface, i ->
+
+                        //delete the droper in the listpage in firebase
+                        deleteUserListInFB(chatLog!!)
+                        // update the rest of the groupmember and group creater
+                        Log.d(TAG,"selecteduser list size: ${selectedList.size}")
+                        val selectedUIDList = removeCurrentFromList(selectedList,currentUser)
+                        Log.d(TAG,"updated selecteduser list size: ${selectedList.size}")
+                        UpdatedUserListInFB(chatLog!!, selectedUIDList, currentUser,groupCreaterUID)
+                        mCallbackToChat.chatLogGoback()
+
+                        dialogInterface.dismiss()
+                    }.setNegativeButton(android.R.string.no){ dialogInterface, i ->
+                        dialogInterface.dismiss()
+                    }
+                builder.show()
+
+            }
+
             else -> {
             }
         }
@@ -459,10 +483,74 @@ class ChatLogFragment : Fragment() {
             override fun onCancelled(p0: DatabaseError) {}
         })
 
+    }
 
+    private fun getSingleChatList(chatLogId: String,currentUser: User) : ArrayList<String>{
+        val currentUserId = currentUser.uid
+        val res = arrayListOf<String>()
+        res.add(currentUserId)
+        if (currentUserId.equals(chatLogId.substring(0,currentUserId.length))){
+            res.add(chatLogId.substring(currentUserId.length))
+        } else {
+            res.add(chatLogId.substring(0,currentUserId.length))
+        }
+        return res
     }
 
 
+
+
+    private fun removeCurrentFromList(selectedList: ArrayList<User>, currentUser: User): ArrayList<String> {
+        var list = arrayListOf<String>()
+        var iterator = selectedList.iterator()
+
+        iterator.forEach {
+            if (it.uid.equals(currentUser.uid)){
+                iterator.remove()
+            }else {
+                list.add(it.uid)
+            }
+        }
+
+        return list
+    }
+
+    fun UpdatedUserListInFB(chatlog: Util.ChatLog, selectedUIDList: ArrayList<String>, currentUser: User, createrUid:String){
+        val voteWaitingListRef = FirebaseDatabase.getInstance().getReference("/${Util.GROUPCHATS}/${chatlog.chatLogId}/groupMember")
+        voteWaitingListRef.setValue(selectedUIDList).addOnSuccessListener {
+            Log.d(ChatLogVote.TAG, "Updated the groupMember list in the GroupChat table(group): ${voteWaitingListRef.key}")
+        }
+        //group creater not include in the seletedList, but creater also need to update
+        // dont need to update the lists table of droper cause it has also delete this chatlog of the list page
+        val allUpdateList = selectedUIDList
+        allUpdateList.add(createrUid)
+        val iterator = allUpdateList.iterator()
+        iterator.forEach {
+            val voteWaitingListRef = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${it}/${chatlog.chatLogId}/selectedUserList")
+            voteWaitingListRef.setValue(selectedList).addOnSuccessListener {
+                Log.d(ChatLogVote.TAG, "Updated the groupMember list in the GroupChat table(group): ${voteWaitingListRef.key}")
+            }
+        }
+
+    }
+
+    fun deleteUserListInFB(chatlog: Util.ChatLog){
+        val opWVUserRef : DatabaseReference = FirebaseDatabase.getInstance().getReference("/${Util.LISTS}/${currentUser.uid}/${chatlog.chatLogId}")
+
+        opWVUserRef.addValueEventListener(object:ValueEventListener{
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(TAG,"deleted selectedUser List Failed:$error")
+            }
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for(waitUser in dataSnapshot.children){
+                    waitUser.ref.removeValue()
+                }
+                Log.d(TAG,"deleted selectedUser List Successfully")
+            }
+
+        })
+    }
 
 
 
@@ -476,6 +564,31 @@ class ChatLogFragment : Fragment() {
         } catch (e: ClassCastException) {
         }
     }
+
+//    private fun updateSenderMessageList(
+//        chatLogId: String,
+//        imageUri: String,
+//        text: String,
+//        timestamp: Long,
+//        currentUser: User
+//    ) {
+//
+//        val memberRef = FirebaseDatabase.getInstance()
+//            .getReference("/${Util.LISTS}/${currentUser.uid}/${chatLogId}")
+//
+//        var latestMessage = ListLatestMessage(Util.ChatLog(chatLogId, chatLogHeader!!),
+//            selectedList, imageUri, text, true, timestamp)
+//
+//
+//        memberRef!!.setValue(latestMessage)
+//            .addOnSuccessListener {
+//                Log.d(
+//                    TAG,
+//                    "add the groupOrSingleId to the list of member: ${memberRef!!.key}, ${chatLogId}"
+//                )
+//            }
+//
+//    }
 }
 
 

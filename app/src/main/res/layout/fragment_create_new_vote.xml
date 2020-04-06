@@ -40,10 +40,11 @@
         android:background="@color/light_gray"
         app:layout_constraintTop_toBottomOf="@id/vote_view_text_new_vote" />
 
+
     <LinearLayout
         android:id="@+id/linearLayout_new_vote"
         android:orientation="vertical"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/delimiter_new_vote">
@@ -58,9 +59,10 @@
                 android:layout_width="250dp"
                 android:layout_height="50dp"
                 android:hint="Search Movie Name"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:text=""
-                android:layout_margin="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
                 android:background="@drawable/rounded_edittext_register_login"
                 android:ems="10"
                 android:layout_gravity="center"
@@ -70,35 +72,56 @@
                 android:id="@+id/add_movie_new_vote"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
-                android:textSize="15sp"
+                android:textSize="14sp"
                 android:text="Search"
                 android:paddingRight="8dp"
                 android:paddingLeft="8dp"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:textColor="@color/white"
-
                 android:background="@drawable/button_clickable" />
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/select_date_new_vote"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:hint="mm/dd/yyyy"
-            android:inputType="datetime"
-            android:text=""
-            android:layout_margin="10dp"
-            android:background="@drawable/rounded_edittext_register_login"
-            android:ems="10"
-            android:textSize="15sp"
-            android:layout_gravity="left"
-            android:paddingLeft="16dp" />
+            <EditText
+                android:id="@+id/select_date_new_vote"
+                android:layout_width="250dp"
+                android:layout_height="50dp"
+                android:hint="dd/mm/yyyy"
+                android:inputType="datetime"
+                android:text=""
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/rounded_edittext_register_login"
+                android:ems="10"
+                android:textSize="14sp"
+                android:layout_gravity="left"
+                android:paddingLeft="16dp" />
+
+            <Button
+                android:id="@+id/choose_date_movie_new_vote"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:textSize="14sp"
+                android:text="Date"
+                android:paddingRight="8dp"
+                android:paddingLeft="8dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:background="@drawable/button_clickable" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:layout_margin="10dp"
         android:id="@+id/recyclerview_newVote"
         android:layout_width="match_parent"
         android:layout_height="0dp"

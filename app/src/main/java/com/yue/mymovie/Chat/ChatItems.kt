@@ -1,6 +1,7 @@
 package com.yue.mymovie.Chat
 
 import android.util.Log
+import android.view.View
 import android.widget.TextView
 import com.squareup.picasso.Picasso
 import com.xwray.groupie.GroupieViewHolder
@@ -68,9 +69,14 @@ class ChatLogItem (val type: String,val text:String, val user: User,val selected
                     Picasso.get().load(uri).into(targetImageView)
                 }
                 val voteView:TextView = viewHolder.itemView.text_from_row_vote
-
+                val voteTitleView = viewHolder.itemView.title_from_row_vote
                 voteView.setOnClickListener {
                     Log.d("VoteItem","click VoteFromItem")
+                    ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+//                    chatAdapter.clear()
+                }
+                voteTitleView.setOnClickListener {
+                    Log.d("VoteItem","click VoteToItem")
                     ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
 //                    chatAdapter.clear()
                 }
@@ -83,7 +89,14 @@ class ChatLogItem (val type: String,val text:String, val user: User,val selected
                 }
 
                 val voteView = viewHolder.itemView.text_to_row_vote
+                val voteTitleView = viewHolder.itemView.title_to_row_vote
                 voteView.setOnClickListener {
+                    Log.d("VoteItem","click VoteToItem")
+                    ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
+//                    chatAdapter.clear()
+                }
+
+                voteTitleView.setOnClickListener {
                     Log.d("VoteItem","click VoteToItem")
                     ChatLogFragment.mCallbackToVoteShow.catLogToVoteShow(selectedList,chatLog,voteId)
 //                    chatAdapter.clear()
@@ -108,6 +121,29 @@ open class ChatLogItemClass(
     constructor(_type:String, _user:User,_selectedList: ArrayList<User>, _chatLog: Util.ChatLog, _voteId:String,_timestamp:Long): this(_type,"",_user, _selectedList,_chatLog,_voteId,_timestamp)
 
 }
+
+class LastMessageItem(val text : String, val  chatLog : Util.ChatLog, val selectedUserList : ArrayList<User>, val uri: String, val timestamp: Long, val readOrNot: Boolean ):Item<GroupieViewHolder>(){
+    override fun getLayout(): Int {
+        return R.layout.latest_message_row
+    }
+
+    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
+        viewHolder.itemView.message_textview_latest_message.text = text
+        val targetImageView = viewHolder.itemView.imageview_latest_message
+        if (uri != ""){
+            Picasso.get().load(uri).into(targetImageView)
+        }
+        viewHolder.itemView.username_textview_latest_message.text = chatLog.chatLogHeader
+        if (readOrNot){
+            viewHolder.itemView.new_message_alert_latest_message.visibility = View.INVISIBLE
+        }
+
+    }
+
+}
+
+
+
 //class ChatFromItem(val text:String, val user: User): Item<GroupieViewHolder>() {
 //    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
 //        viewHolder.itemView.textview_from_row.text =text
@@ -192,22 +228,3 @@ open class ChatLogItemClass(
 //        return R.layout.vote_to_row
 //    }
 //}
-
-
-
-
-class LastMessageItem(val text : String, val  chatLog : Util.ChatLog, val selectedUserList : ArrayList<User>, val uri: String, val timestamp: Long, val readOrNot: Boolean ):Item<GroupieViewHolder>(){
-    override fun getLayout(): Int {
-        return R.layout.latest_message_row
-    }
-
-    override fun bind(viewHolder: GroupieViewHolder, position: Int) {
-        viewHolder.itemView.message_textview_latest_message.text = text
-        val targetImageView = viewHolder.itemView.imageview_latest_message
-        if (uri != ""){
-            Picasso.get().load(uri).into(targetImageView)
-        }
-        viewHolder.itemView.username_textview_latest_message.text = chatLog.chatLogHeader
-    }
-
-}

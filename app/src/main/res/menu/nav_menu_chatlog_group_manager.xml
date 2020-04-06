@@ -10,4 +10,9 @@
         android:icon="@drawable/ic_history_vote"
         android:title="All the Vote History"
         app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/menu_vote_drop_group"
+        android:icon="@drawable/ic_drop_group"
+        android:title="Drop the group"
+        app:showAsAction="ifRoom"/>
 </menu>
