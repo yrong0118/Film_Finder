@@ -31,7 +31,7 @@ class ChatLogVote {
             val voteRef = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}").push()
             val chatVote = ChatVote(voteRef.key!!, currentUserUID,startVoteTimeStamp,endVoteTimestamp)
             voteRef.setValue(chatVote)
-                    //*******************************************
+                //*******************************************
                 .addOnSuccessListener {
                     Log.d(TAG, "waitList Size: ${waitVoteUserList.size}")
                     Log.d(TAG, "voteMovieIdList: ${voteMovieIdList.size}")

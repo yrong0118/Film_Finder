@@ -27,6 +27,7 @@ import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
 import com.yue.mymovie.Util.Companion.convertTime
+import com.yue.mymovie.Util.Companion.fetchCurrentUser2
 import com.yue.mymovie.Util.Companion.getTimestamp
 import com.yue.mymovie.retrofit.BaseResponse
 import com.yue.mymovie.retrofit.MovieDetailRequestApi
@@ -119,58 +120,68 @@ class ShowVoteMoveListFragment : Fragment() {
             mCallbackToChat.movieVoteShowGoBack(selectedList,chatLog!!)
         }
 
-        voteBtn.setOnClickListener{
-            val timestamp = getTimestamp()
-            if (endVote < timestamp) {
-                Toast.makeText(this.context,"Vote has expired! You Cannot Vote nymore",Toast.LENGTH_SHORT).show()
-            } else {
-                Log.d(TAG,"waitUserIdList.size: $waitUserVoteList.size}")
-                voteMovieAdapter.clear()
-                movieCandidateSet.clear()
-                waitUserIdSet.clear()
-                Log.d(TAG,"new Instance: voteMovieByKWList size: ${voteMovieByKWList.size}}")
-                mCallbackToVoteAction.gotoVoteAction(selectedList, chatLog!!, voteId!!,waitUserVoteList,voteMovieByKWList)
+        fetchCurrentUser2 {currentUser ->
+            voteBtn.setOnClickListener{
+                val timestamp = getTimestamp()
+                val waitUserSet = mutableSetOf<String>()
+                for (i in 0 until waitUserVoteList.size){
+                    waitUserSet.add(waitUserVoteList[i].UserId)
+                }
+
+                if (endVote < timestamp) {
+                    Toast.makeText(this.context,"Vote has expired! You Cannot Vote nymore",Toast.LENGTH_SHORT).show()
+                } else if (!waitUserSet.contains(currentUser.uid)){
+                    Toast.makeText(this.context,"You Cannot Vote Again!",Toast.LENGTH_SHORT).show()
+                }else {
+                    Log.d(TAG,"waitUserIdList.size: $waitUserVoteList.size}")
+                    voteMovieAdapter.clear()
+                    movieCandidateSet.clear()
+                    waitUserIdSet.clear()
+                    Log.d(TAG,"new Instance: voteMovieByKWList size: ${voteMovieByKWList.size}}")
+                    mCallbackToVoteAction.gotoVoteAction(selectedList, chatLog!!, voteId!!,waitUserVoteList,voteMovieByKWList)
+                }
+
+            }
+            var movieList = arrayListOf<VoteMovieGrade>()
+            getMovieGrade(movieList, voteId!!){
+
+                Log.d(TAG ,"voteMovieGradeList size is : ${it.size}")
+
+                if (!movieCandidateSet.contains(it[it.size-1].MovieId)){
+                    movieCandidateSet.add(it[it.size-1].MovieId)
+                    voteMovieGradeList.add(it[it.size-1])
+                    Log.d(TAG ,"movie id is : ${it[it.size-1].MovieId}")
+                    Log.d(TAG ,"movie grade is : ${it[it.size-1].grade}")
+                    var currMovieByKW = MovieByKW("",it[it.size-1].MovieId,"",it[it.size-1].grade)
+                    Log.d(TAG,"current movie id: ${currMovieByKW.movieId} before geting pic")
+                    getMovieData(currMovieByKW)
+                }
             }
 
-        }
-        var movieList = arrayListOf<VoteMovieGrade>()
-        getMovieGrade(movieList, voteId!!){
+            getvoteDate(voteId!!,"startVoteTimeStamp"){
+                startVote = it
+                val date = convertTime(it)
+                startVoteDateTV.setText(date)
+            }
 
-            Log.d(TAG ,"voteMovieGradeList size is : ${it.size}")
+            getvoteDate(voteId!!,"endVoteTimeStamp"){
+                endVote = it
+                val date = convertTime(it)
+                endVoteDateTV.setText(date)
+            }
 
-            if (!movieCandidateSet.contains(it[it.size-1].MovieId)){
-                movieCandidateSet.add(it[it.size-1].MovieId)
-                voteMovieGradeList.add(it[it.size-1])
-                Log.d(TAG ,"movie id is : ${it[it.size-1].MovieId}")
-                Log.d(TAG ,"movie grade is : ${it[it.size-1].grade}")
-                var currMovieByKW = MovieByKW("",it[it.size-1].MovieId,"",it[it.size-1].grade)
-                Log.d(TAG,"current movie id: ${currMovieByKW.movieId} before geting pic")
-                getMovieData(currMovieByKW)
+            var userList = arrayListOf<WaitVoteUser>()
+            getRestUserList(userList, voteId!!){
+                Log.d(TAG ,"waitUSerIdList size is : ${it.size}")
+                if (!waitUserIdSet.contains(it[it.size-1].UserId)){
+                    waitUserIdSet.add(it[it.size-1].UserId)
+                    waitUserVoteList.add(it[it.size-1])
+                    Log.d(TAG ,"movie id is : ${it[it.size-1].UserId}")
+                }
+
             }
         }
 
-        getvoteDate(voteId!!,"startVoteTimeStamp"){
-            startVote = it
-            val date = convertTime(it)
-            startVoteDateTV.setText(date)
-        }
-
-        getvoteDate(voteId!!,"endVoteTimeStamp"){
-            endVote = it
-            val date = convertTime(it)
-            endVoteDateTV.setText(date)
-        }
-
-        var userList = arrayListOf<WaitVoteUser>()
-        getRestUserList(userList, voteId!!){
-            Log.d(TAG ,"waitUSerIdList size is : ${it.size}")
-            if (!waitUserIdSet.contains(it[it.size-1].UserId)){
-                waitUserIdSet.add(it[it.size-1].UserId)
-                waitUserVoteList.add(it[it.size-1])
-                Log.d(TAG ,"movie id is : ${it[it.size-1].UserId}")
-            }
-
-        }
         return view
     }
 

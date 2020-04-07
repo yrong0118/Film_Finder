@@ -99,9 +99,10 @@ class VoteMovieActionFragment : Fragment() {
 
         Util.fetchCurrentUser2 { currentUser ->
 
-
+            Log.d(TAG,"waitUserIdList size: ${waitUserIdList.size}")
 
             confirmBtn.setOnClickListener{
+
 
                 Log.d(TAG,"selectedMovieSet.size :${selectedMovieSet.size}")
 
@@ -144,44 +145,41 @@ class VoteMovieActionFragment : Fragment() {
                 Firebase.getMovieGrade (voteMovieGradeList, voteId!!){
                     Log.d(TAG, "voteMovieGradeList size is : ${it.size}")
 
-                        if(!movieCandidateSet.contains(it[it.size - 1].MovieId)){
-                            movieCandidateSet.add(it[it.size - 1].MovieId)
-                            Log.d(TAG,"movieCandidateSet.size: ${movieCandidateSet.size}")
-                            if (selectedMovieSet.contains(it[it.size - 1].MovieId)){
-                                it[it.size - 1].grade += 1
-                                Log.d(TAG,"movieid: ${it[it.size - 1].MovieId}, new grade: ${it[it.size - 1].grade}")
-                            } else {
-                                Log.d(TAG,"movieid: ${it[it.size - 1].MovieId}, remain grade: ${it[it.size - 1].grade}")
-                            }
-                            movieList.add(VoteMovieGrade(it[it.size - 1].MovieId,it[it.size - 1].grade))
-
-                            Log.d(TAG,"movieCandidateList.size: ${movieCandidateList.size}")
-
-                            if (movieCandidateSet.size.equals(movieCandidateList.size) && (movieCandidateList.size!= 0)) {
-                                //这里还是有点问题，每次movieCandidateList每增加一次都会运行这里，
-                                // 从0-总共可选电影数量，只要不等于0 还是可以更新，可以初步解决问题， 但有待提升
-                                Log.d(TAG,"Update movie grade List.size: ${movieList.size}")
-                                //delete movieVoteGrade
-
-                                selectedMovieSet.clear()
-                                movieCandidateList.clear()
-                                movieCandidateSet.clear()
-                                voteMovieAdapter.clear()
-                                deleteMovieVoteGrade()
-                                Firebase.addMovieVoteList(voteId!!, movieList)
-
-                                mCallbackToShowVote.movieVoteActionGoBack(selectedList, chatLog!!,voteId!!)
-
-
-
-                            }
+                    if(!movieCandidateSet.contains(it[it.size - 1].MovieId)){
+                        movieCandidateSet.add(it[it.size - 1].MovieId)
+                        Log.d(TAG,"movieCandidateSet.size: ${movieCandidateSet.size}")
+                        if (selectedMovieSet.contains(it[it.size - 1].MovieId)){
+                            it[it.size - 1].grade += 1
+                            Log.d(TAG,"movieid: ${it[it.size - 1].MovieId}, new grade: ${it[it.size - 1].grade}")
+                        } else {
+                            Log.d(TAG,"movieid: ${it[it.size - 1].MovieId}, remain grade: ${it[it.size - 1].grade}")
                         }
+                        movieList.add(VoteMovieGrade(it[it.size - 1].MovieId,it[it.size - 1].grade))
+
+                        Log.d(TAG,"movieCandidateList.size: ${movieCandidateList.size}")
+
+                        if (movieCandidateSet.size.equals(movieCandidateList.size) && (movieCandidateList.size!= 0)) {
+                            //这里还是有点问题，每次movieCandidateList每增加一次都会运行这里，
+                            // 从0-总共可选电影数量，只要不等于0 还是可以更新，可以初步解决问题， 但有待提升
+                            Log.d(TAG,"Update movie grade List.size: ${movieList.size}")
+                            //delete movieVoteGrade
+
+                            selectedMovieSet.clear()
+                            movieCandidateList.clear()
+                            movieCandidateSet.clear()
+                            voteMovieAdapter.clear()
+                            deleteMovieVoteGrade()
+                            Firebase.addMovieVoteList(voteId!!, movieList)
+
+                            mCallbackToShowVote.movieVoteActionGoBack(selectedList, chatLog!!,voteId!!)
+
+
+
+                        }
+                    }
 
 
                 }
-
-
-
 
 
             }
