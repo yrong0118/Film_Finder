@@ -186,6 +186,13 @@ class Util {
             return newDate
         }
 
+
+        fun convertTime(time: Long): String {
+            val date = Date(time * 1000)
+            val format = SimpleDateFormat("dd/ MM/ yyyy")
+            return format.format(date)
+        }
+
         fun getChatLogItemClass (messageOrVote: MessageType, chatLogItemClassList:ArrayList<ChatLogItemClass>, currentUser:User,selectedList: ArrayList<User>,chatLog: ChatLog,onGetClass: (ArrayList<ChatLogItemClass>) -> Unit){
 //            chatLogItemClassList.clear()
             if (messageOrVote.messageType.equals(Util.MESSAGE)) {

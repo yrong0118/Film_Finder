@@ -41,6 +41,52 @@
         android:background="@color/light_gray"
         app:layout_constraintTop_toBottomOf="@id/vote_view_text_show_vote" />
 
+    <TextView
+        android:id="@+id/start_vote_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Start Vote Date:"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/vote_view_text_show_vote"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <TextView
+        android:id="@+id/start_vote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="the start date of vote"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/start_vote_header"
+        app:layout_constraintLeft_toRightOf="@id/start_vote_header" />
+
+
+    <TextView
+        android:id="@+id/end_vote_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="End Vote Date:"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/start_vote_header"
+        app:layout_constraintRight_toRightOf="@id/start_vote_header"
+        app:layout_constraintTop_toBottomOf="@id/start_vote_header" />
+
+    <TextView
+        android:id="@+id/end_vote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="the end date of vote"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@id/end_vote_header"
+        app:layout_constraintLeft_toRightOf="@id/end_vote_header" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_show_vote"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -49,7 +95,7 @@
         app:layout_constraintBottom_toTopOf="@+id/vote_button_show_vote"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/delimiter_show_vote"/>
+        app:layout_constraintTop_toBottomOf="@id/end_vote_header"/>
 
     <Button
         android:id="@+id/vote_button_show_vote"

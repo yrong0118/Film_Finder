@@ -15,15 +15,19 @@ import com.yue.mymovie.Chat.VoteModel.VoteMovieGrade
 import com.yue.mymovie.LoginOrRegister.User
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.yue.mymovie.Chat.ChatModel.VoteMovieItem
 import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.getMovieGrade
 import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.getRestUserList
+import com.yue.mymovie.Chat.VoteModel.Firebase.Companion.getvoteDate
 import com.yue.mymovie.Chat.VoteModel.WaitVoteUser
 
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
+import com.yue.mymovie.Util.Companion.convertTime
+import com.yue.mymovie.Util.Companion.getTimestamp
 import com.yue.mymovie.retrofit.BaseResponse
 import com.yue.mymovie.retrofit.MovieDetailRequestApi
 import com.yue.mymovie.retrofit.RetrofitClient
@@ -82,7 +86,8 @@ class ShowVoteMoveListFragment : Fragment() {
     lateinit var mCallbackToVoteAction:GotoVoteActionListener
     lateinit var recyclerViewMovieVote : RecyclerView
     lateinit var voteBtn: Button
-
+    lateinit var startVoteDateTV: TextView
+    lateinit var endVoteDateTV: TextView
 
     var voteMovieAdapter = GroupAdapter<GroupieViewHolder>()
 
@@ -101,6 +106,10 @@ class ShowVoteMoveListFragment : Fragment() {
         api = getString(R.string.glu_KEY)
         language = getString(R.string.language)
         imgFrontPath= getString(R.string.img_front_path)
+        startVoteDateTV = view.findViewById(R.id.start_vote)
+        endVoteDateTV = view.findViewById(R.id.end_vote)
+        var startVote : Long = -1
+        var endVote : Long = -1
 
         goBackToChatLogBtn.setOnClickListener {
             voteMovieAdapter.clear()
@@ -111,12 +120,17 @@ class ShowVoteMoveListFragment : Fragment() {
         }
 
         voteBtn.setOnClickListener{
-            Log.d(TAG,"waitUSerIdList.size: $waitUserVoteList.size}")
-            voteMovieAdapter.clear()
-            movieCandidateSet.clear()
-            waitUserIdSet.clear()
-            Log.d(TAG,"new Instance: voteMovieByKWList size: ${voteMovieByKWList.size}}")
-            mCallbackToVoteAction.gotoVoteAction(selectedList, chatLog!!, voteId!!,waitUserVoteList,voteMovieByKWList)
+            val timestamp = getTimestamp()
+            if (endVote < timestamp) {
+                Toast.makeText(this.context,"Vote has expired! You Cannot Vote nymore",Toast.LENGTH_SHORT).show()
+            } else {
+                Log.d(TAG,"waitUserIdList.size: $waitUserVoteList.size}")
+                voteMovieAdapter.clear()
+                movieCandidateSet.clear()
+                waitUserIdSet.clear()
+                Log.d(TAG,"new Instance: voteMovieByKWList size: ${voteMovieByKWList.size}}")
+                mCallbackToVoteAction.gotoVoteAction(selectedList, chatLog!!, voteId!!,waitUserVoteList,voteMovieByKWList)
+            }
 
         }
         var movieList = arrayListOf<VoteMovieGrade>()
@@ -133,6 +147,18 @@ class ShowVoteMoveListFragment : Fragment() {
                 Log.d(TAG,"current movie id: ${currMovieByKW.movieId} before geting pic")
                 getMovieData(currMovieByKW)
             }
+        }
+
+        getvoteDate(voteId!!,"startVoteTimeStamp"){
+            startVote = it
+            val date = convertTime(it)
+            startVoteDateTV.setText(date)
+        }
+
+        getvoteDate(voteId!!,"endVoteTimeStamp"){
+            endVote = it
+            val date = convertTime(it)
+            endVoteDateTV.setText(date)
         }
 
         var userList = arrayListOf<WaitVoteUser>()

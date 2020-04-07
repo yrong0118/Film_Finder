@@ -2,7 +2,6 @@ package com.yue.mymovie.Chat.VoteModel
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,8 +12,6 @@ import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.GroupieViewHolder
-import com.yue.mymovie.Chat.ChatLogFragment
-import com.yue.mymovie.Chat.ChatModel.ChatLogVote
 import com.yue.mymovie.Chat.ChatModel.ChatLogVote.Companion.performSendVoteToGroup
 import com.yue.mymovie.Chat.ChatModel.MovieByKW
 import com.yue.mymovie.Chat.ChatModel.VoteItem
@@ -22,7 +19,7 @@ import com.yue.mymovie.LoginOrRegister.User
 
 import com.yue.mymovie.R
 import com.yue.mymovie.Util
-import java.sql.Date
+import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -128,11 +125,14 @@ class CreateNewVoteFragment : Fragment() {
         Util.fetchCurrentUser2 { currentUser ->
             val timestamp = Util.getTimestamp()
             startVote = timestamp
+
             confirmBtn.setOnClickListener{
                 if(selectedMovieList.size == 0) {
                     Toast.makeText(this.context,"Please Search the Movies to Vote First!",Toast.LENGTH_SHORT).show()
                 } else if (endVote.equals(-1L)){
                     Toast.makeText(this.context,"Please Choose the End Date of the Vote!",Toast.LENGTH_SHORT).show()
+                } else if (endVote < timestamp) {
+                    Toast.makeText(this.context,"The End Date MUST Start Or After Today!",Toast.LENGTH_SHORT).show()
                 }else{
                     val waitinglist = selectedList
                     performSendVoteToGroup(waitinglist, selectedMovieList,currentUser,startVote, endVote)
@@ -147,6 +147,8 @@ class CreateNewVoteFragment : Fragment() {
 
             addNewMovieBtn.setOnClickListener{
                 var searchMovieKeyWordText= searchMovieKeyWordTextView.text.toString().trim()
+                searchMovieKeyWordText = URLEncoder.encode(searchMovieKeyWordText, "UTF-8")
+                Log.d(TAG,"URLEncoder: ${searchMovieKeyWordText}")
                 searchMovieKeyWordTextView.text.clear()
                 adapternewVote.clear()
                 mCallbackToSearchMovie.newVoteserchMovie(selectedList, selectedMovieList,chatLog,searchMovieKeyWordText)

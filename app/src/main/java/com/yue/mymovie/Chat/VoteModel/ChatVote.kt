@@ -25,6 +25,12 @@ class VoteMovieGrade (
     constructor():this("",0)
 }
 
+class VoteTimestamp (
+    var timestamp: Long
+){
+    constructor():this(-1)
+}
+
 //data class ChatVote(val voteId: String, val sendUserId: String, var waitVoteUserId: ArrayList<String>, var movieVoteUserId: ArrayList<MovieVote>, val startVoteTimeStamp: Long, val endVoteTimestamp: Long) {
 //    constructor() : this("", "", arrayListOf<String>(), arrayListOf<MovieVote>(),-1,-1)
 //    //movieList(MovieId, VoteGread)
@@ -94,6 +100,44 @@ class Firebase{
                 override fun onChildRemoved(p0: DataSnapshot) {
                 }
             })
+        }
+
+        fun getvoteDate(voteId: String,voteDateType: String, getVoteDate: (Long) -> Unit){
+            var ref = FirebaseDatabase.getInstance().getReference("/${Util.VOTES}/${voteId}/${voteDateType}")
+            ref.addValueEventListener(object :ValueEventListener{
+                override fun onCancelled(p0: DatabaseError) {
+
+                }
+
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val voteTimestamp = dataSnapshot.getValue(Long::class.java)
+                    if(voteTimestamp != null) {
+                        getVoteDate(voteTimestamp)
+                        Log.d(ShowVoteMoveListFragment.TAG,"${voteTimestamp}")
+                    }
+                }
+
+            })
+//            ref.addChildEventListener(object: ChildEventListener {
+//                override fun onCancelled(p0: DatabaseError) {
+//
+//                }
+//
+//                override fun onChildMoved(p0: DataSnapshot, p1: String?) {
+//
+//                }
+//
+//                override fun onChildChanged(p0: DataSnapshot, p1: String?) {
+//
+//                }
+//
+//                override fun onChildAdded(dataSnapshot: DataSnapshot, p1: String?) {
+//
+//                }
+//
+//                override fun onChildRemoved(p0: DataSnapshot) {
+//                }
+//            })
         }
 
         fun getRestUserList(waitUserIdList: ArrayList<WaitVoteUser>, voteId: String, getList: (ArrayList<WaitVoteUser>) -> Unit){
