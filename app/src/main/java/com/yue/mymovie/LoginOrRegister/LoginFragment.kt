@@ -81,7 +81,7 @@ class LoginFragment : Fragment() {
 
         val preferences: SharedPreferences = this.activity!!.getSharedPreferences("mymovie", Context.MODE_PRIVATE)
 
-        email.setText(preferences.getString("SAVED_USERNAME", ""))
+        email.setText(preferences.getString("SAVED_USEREMAIL", ""))
         passWord.setText(preferences.getString("SAVED_PASSWORD",""))
         email.addTextChangedListener(textWatcher!!)
         passWord.addTextChangedListener(textWatcher!!)

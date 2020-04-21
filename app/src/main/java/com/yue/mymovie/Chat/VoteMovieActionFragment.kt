@@ -189,9 +189,6 @@ class VoteMovieActionFragment : Fragment() {
         return view
     }
 
-
-
-
     private fun getWaitVoteUserListById(waitUserIdList: ArrayList<WaitVoteUser>, currentUser: User): ArrayList<WaitVoteUser> {
 //        var userSet = mutableSetOf<String>()
         var list = arrayListOf<WaitVoteUser>()

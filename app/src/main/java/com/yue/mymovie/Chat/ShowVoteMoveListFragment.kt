@@ -89,6 +89,7 @@ class ShowVoteMoveListFragment : Fragment() {
     lateinit var voteBtn: Button
     lateinit var startVoteDateTV: TextView
     lateinit var endVoteDateTV: TextView
+    lateinit var voteStatus: TextView
 
     var voteMovieAdapter = GroupAdapter<GroupieViewHolder>()
 
@@ -109,9 +110,10 @@ class ShowVoteMoveListFragment : Fragment() {
         imgFrontPath= getString(R.string.img_front_path)
         startVoteDateTV = view.findViewById(R.id.start_vote)
         endVoteDateTV = view.findViewById(R.id.end_vote)
+        voteStatus = view.findViewById(R.id.vote_statue)
         var startVote : Long = -1
         var endVote : Long = -1
-
+        val timestamp = getTimestamp()
         goBackToChatLogBtn.setOnClickListener {
             voteMovieAdapter.clear()
             movieCandidateSet.clear()
@@ -129,7 +131,7 @@ class ShowVoteMoveListFragment : Fragment() {
                 }
 
                 if (endVote < timestamp) {
-                    Toast.makeText(this.context,"Vote has expired! You Cannot Vote nymore",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this.context,"Vote has expired! You Cannot Vote Anymore",Toast.LENGTH_SHORT).show()
                 } else if (!waitUserSet.contains(currentUser.uid)){
                     Toast.makeText(this.context,"You Cannot Vote Again!",Toast.LENGTH_SHORT).show()
                 }else {
@@ -166,6 +168,9 @@ class ShowVoteMoveListFragment : Fragment() {
 
             getvoteDate(voteId!!,"endVoteTimeStamp"){
                 endVote = it
+                if (endVote < timestamp) {
+                    voteStatus.setText("Vote Expired")
+                }
                 val date = convertTime(it)
                 endVoteDateTV.setText(date)
             }
@@ -229,9 +234,5 @@ class ShowVoteMoveListFragment : Fragment() {
         } catch (e: ClassCastException) {
         }
     }
-
-
-
-
 
 }
